@@ -1,0 +1,9 @@
+﻿{
+  "scannedAt": "2026-09-12",
+  "framework": "React 19 + Vite",
+  "fontStack": "Default sans / system",
+  "palette": "Tailwind CSS (brand blues + slate-50/slate-950)",
+  "motionStance": "motion-cut",
+  "styling": "Tailwind CSS v3.4 + PostCSS",
+  "libraries": ["lucide-react", "chart.js", "react-chartjs-2", "jspdf", "canvas-confetti"]
+}
