@@ -1,24 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   Compass, 
-  CheckCircle2, 
-  XCircle, 
-  Layers, 
-  Sliders, 
-  Zap, 
-  ShieldCheck, 
-  Database,
-  ArrowRight,
-  TrendingUp
+  Layers 
 } from 'lucide-react';
 
 export default function RecommendationEngine({ metrics }) {
-  const { recommendation, latency, storage, anomaly, inputs } = metrics;
-
-  // Interactive SLA target constraints
-  const [maxReadLatencyTarget, setMaxReadLatencyTarget] = useState(15);
-  const [maxStorageBudgetGb, setMaxStorageBudgetGb] = useState(50);
-  const [allowAsyncConsistency, setAllowAsyncConsistency] = useState(true);
+  const { recommendation, latency, storage, inputs } = metrics;
 
   // Architectural Strategies Matrix
   const strategies = [
@@ -84,23 +71,23 @@ export default function RecommendationEngine({ metrics }) {
     <div className="space-y-6">
       
       {/* Top Banner with Verdict */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+      <div className="glass-panel p-6 rounded-2xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 mb-4 border-b border-slate-200/50 dark:border-white/10">
           <div className="flex items-center space-x-3">
-            <div className="p-2.5 rounded-xl bg-sky-600 text-white shadow-md shadow-sky-500/25">
-              <Compass className="w-6 h-6" />
+            <div className="p-2.5 rounded-xl bg-gradient-to-tr from-cyan-500 to-emerald-600 text-white shadow-md shadow-cyan-500/25 ring-1 ring-white/30">
+              <Compass className="w-6 h-6 drop-shadow-xs" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h2 className="text-xl font-black text-slate-900 dark:text-white">
+                <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
                   DBA Architectural Advisor
                 </h2>
-                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold glass-pill ${
                   recommendation.badgeColor === 'emerald'
-                    ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                    ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-400/30'
                     : recommendation.badgeColor === 'rose'
-                      ? 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300'
-                      : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
+                      ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-400/30'
+                      : 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-400/30'
                 }`}>
                   {recommendation.verdict}
                 </span>
@@ -112,15 +99,15 @@ export default function RecommendationEngine({ metrics }) {
           </div>
 
           <div className="text-right">
-            <div className="text-xs text-slate-400">Optimal Strategy:</div>
-            <div className="text-sm font-black text-sky-600 dark:text-sky-400">
+            <div className="text-xs text-slate-500 dark:text-slate-400">Optimal Strategy:</div>
+            <div className="text-sm font-black text-cyan-600 dark:text-cyan-400">
               {recommendation.strategy}
             </div>
           </div>
         </div>
 
         {/* Detailed Summary */}
-        <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 mb-4 text-xs leading-relaxed text-slate-700 dark:text-slate-300">
+        <div className="p-4 rounded-xl glass-card mb-4 text-xs leading-relaxed text-slate-700 dark:text-slate-300">
           {recommendation.summary}
         </div>
 
@@ -131,8 +118,8 @@ export default function RecommendationEngine({ metrics }) {
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {recommendation.actionItems.map((item, idx) => (
-              <div key={idx} className="p-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 flex items-start space-x-2 shadow-xs">
-                <span className="w-5 h-5 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-300 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">
+              <div key={idx} className="p-3.5 rounded-xl glass-card text-xs text-slate-700 dark:text-slate-300 flex items-start space-x-2">
+                <span className="w-5 h-5 rounded-full bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5 border border-cyan-400/30">
                   {idx + 1}
                 </span>
                 <span>{item}</span>
@@ -143,9 +130,11 @@ export default function RecommendationEngine({ metrics }) {
       </div>
 
       {/* Strategy Comparison Matrix */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <div className="flex items-center space-x-2 pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
-          <Layers className="w-5 h-5 text-indigo-500" />
+      <div className="glass-panel p-6 rounded-2xl">
+        <div className="flex items-center space-x-2 pb-4 mb-4 border-b border-slate-200/50 dark:border-white/10">
+          <div className="p-2 rounded-xl bg-teal-500/15 text-teal-600 dark:text-teal-400 border border-teal-500/20">
+            <Layers className="w-5 h-5" />
+          </div>
           <h3 className="font-bold text-slate-900 dark:text-white text-base">
             Architectural Alternatives & Pareto Comparison
           </h3>
@@ -155,10 +144,10 @@ export default function RecommendationEngine({ metrics }) {
           {strategies.map((strat, i) => (
             <div 
               key={i} 
-              className={`p-4 rounded-xl border transition-all ${
+              className={`p-5 rounded-2xl transition-all ${
                 strat.recommend 
-                  ? 'border-sky-500 ring-2 ring-sky-500/20 bg-sky-50/20 dark:bg-sky-950/20' 
-                  : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'
+                  ? 'glass-card border-cyan-400 dark:border-cyan-500 ring-2 ring-cyan-400/30 shadow-md shadow-cyan-500/10' 
+                  : 'glass-card-interactive'
               }`}
             >
               <div className="flex items-center justify-between mb-2">
@@ -166,7 +155,7 @@ export default function RecommendationEngine({ metrics }) {
                   <span>{strat.name}</span>
                 </h4>
                 {strat.recommend && (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-600 text-white shadow-xs">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-600 text-white shadow-sm shadow-cyan-600/30 border border-cyan-400/40">
                     TOP MATCH
                   </span>
                 )}
@@ -177,17 +166,17 @@ export default function RecommendationEngine({ metrics }) {
               </p>
 
               {/* Metrics Pills */}
-              <div className="grid grid-cols-3 gap-2 py-2 mb-3 border-y border-slate-100 dark:border-slate-800 text-center text-xs">
-                <div>
-                  <div className="text-[10px] text-slate-400">Read Latency</div>
+              <div className="grid grid-cols-3 gap-2 py-2.5 mb-3 border-y border-slate-200/50 dark:border-white/10 text-center text-xs">
+                <div className="glass-pill p-1.5 rounded-lg">
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400">Read Latency</div>
                   <div className="font-bold text-slate-800 dark:text-slate-200">{strat.estReadMs} ms</div>
                 </div>
-                <div>
-                  <div className="text-[10px] text-slate-400">Write Latency</div>
+                <div className="glass-pill p-1.5 rounded-lg">
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400">Write Latency</div>
                   <div className="font-bold text-slate-800 dark:text-slate-200">{strat.estWriteMs} ms</div>
                 </div>
-                <div>
-                  <div className="text-[10px] text-slate-400">Storage</div>
+                <div className="glass-pill p-1.5 rounded-lg">
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400">Storage</div>
                   <div className="font-bold text-slate-800 dark:text-slate-200">{strat.estStorageGb} GB</div>
                 </div>
               </div>
@@ -195,19 +184,19 @@ export default function RecommendationEngine({ metrics }) {
               {/* Progress Pillar Scores */}
               <div className="space-y-1.5 text-[11px]">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Read Speed:</span>
+                  <span className="text-slate-500 dark:text-slate-400">Read Speed:</span>
                   <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{strat.readScore}/10</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Write Efficiency:</span>
+                  <span className="text-slate-500 dark:text-slate-400">Write Efficiency:</span>
                   <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{strat.writeScore}/10</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Storage Efficiency:</span>
+                  <span className="text-slate-500 dark:text-slate-400">Storage Efficiency:</span>
                   <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{strat.storageScore}/10</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">ACID Consistency:</span>
+                  <span className="text-slate-500 dark:text-slate-400">ACID Consistency:</span>
                   <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{strat.consistencyScore}/10</span>
                 </div>
               </div>

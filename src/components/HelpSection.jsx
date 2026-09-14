@@ -1,15 +1,5 @@
 import React from 'react';
-import { 
-  HelpCircle, 
-  Sliders, 
-  Play, 
-  Download, 
-  Sun, 
-  Cpu, 
-  BarChart3, 
-  CheckCircle2, 
-  Info 
-} from 'lucide-react';
+import { HelpCircle, RotateCcw, Zap, Layers } from 'lucide-react';
 
 export default function HelpSection() {
   return (
@@ -17,165 +7,217 @@ export default function HelpSection() {
       
       {/* Title Header */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 text-xs font-semibold">
+        <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-cyan-100 dark:bg-cyan-950 text-cyan-800 dark:text-cyan-300 text-xs font-semibold">
           <HelpCircle className="w-3.5 h-3.5" />
           <span>User Manual & Guide</span>
         </div>
-        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-          Help & Operational Instructions
+        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+          Help & User Manual
         </h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
-          Complete step-by-step guide on how to configure inputs, run simulations, interpret outputs, and export reports.
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
+          Complete instructions on how to use the analyzer tool, interpret 0-10 trade-off scores, and export audit reports.
         </p>
       </div>
 
-      {/* Step 1: What the Application Does */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-        <div className="flex items-center space-x-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-          <span className="w-7 h-7 rounded-lg bg-sky-600 text-white flex items-center justify-center font-bold text-sm">1</span>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-            What the Application Does
-          </h2>
-        </div>
+      {/* 1. What the Website Does */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-7 shadow-sm space-y-3">
+        <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+          <span className="w-6 h-6 rounded-full bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 flex items-center justify-center text-xs font-bold">1</span>
+          <span>What the Website Does</span>
+        </h2>
         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-          The <strong>Denormalization Trade-off Analyzer</strong> is an interactive engineering simulator. It models what happens to database performance and data consistency when you transform a normalized relational database (3NF/BCNF) into a denormalized schema (pre-joined wide tables, redundant columns, or pre-computed rollups). It calculates the exact cost in terms of <strong>Read Latency, Write Penalty, Storage Bloat, Lock Contention, and Anomaly Risk</strong>.
+          The <strong>Denormalization Trade-off Analyzer</strong> is an interactive educational tool designed for students, database administrators, and software developers. It helps you evaluate whether a relational database should be kept in <strong>Strict Normalization (3NF)</strong> or whether it should be <strong>Denormalized</strong> for read performance.
+        </p>
+        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          By inputting key characteristics of your workload—such as row count, read/write ratio, query complexity, storage sensitivity, and consistency criticality—the analyzer calculates objective 0–10 scores across 5 core dimensions and outputs a clear recommendation: <em>“Prefer Normalization”</em>, <em>“Prefer Denormalization”</em>, or <em>“Hybrid”</em>.
         </p>
       </div>
 
-      {/* Step 2: Available Inputs & How to Provide Them */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-        <div className="flex items-center space-x-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-          <span className="w-7 h-7 rounded-lg bg-sky-600 text-white flex items-center justify-center font-bold text-sm">2</span>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-            Available Inputs & How to Configure Them
-          </h2>
-        </div>
+      {/* 2. Step-by-Step Instructions */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-7 shadow-sm space-y-4">
+        <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+          <span className="w-6 h-6 rounded-full bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 flex items-center justify-center text-xs font-bold">2</span>
+          <span>Step-by-Step Instructions</span>
+        </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-            <strong className="text-sky-600 dark:text-sky-400 block mb-1">1. Workload Presets:</strong>
-            <p className="text-slate-600 dark:text-slate-300">
-              Click any of the preset cards (e.g., <em>E-Commerce Orders</em>, <em>Social Media Feed</em>, <em>Financial Ledger</em>, <em>IoT Stream</em>) to load real-world production configurations with pre-tuned parameters.
+        <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
+          
+          <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 space-y-1">
+            <strong className="text-slate-900 dark:text-white block font-bold">
+              Step A: Navigating to the Analyzer
+            </strong>
+            <p>
+              Click on the <strong>“Analyzer”</strong> tab in the top navigation bar. This opens the interactive form and visualization studio.
             </p>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-            <strong className="text-sky-600 dark:text-sky-400 block mb-1">2. Read QPS & Write QPS:</strong>
-            <p className="text-slate-600 dark:text-slate-300">
-              Adjust the Read QPS and Write QPS sliders to match your application traffic. This shifts the <strong>Read:Write ratio</strong>, heavily influencing the break-even curve.
+          <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 space-y-1">
+            <strong className="text-slate-900 dark:text-white block font-bold">
+              Step B: Filling Each Input Field
+            </strong>
+            <ul className="list-disc pl-5 space-y-1">
+              <li><strong>Table Row Count:</strong> Enter your estimated primary table row count (e.g. 10,000, 2,000,000, or 50,000,000) or click one of the quick preset pills (10K, 500K, 2M, 10M, 50M).</li>
+              <li><strong>Read / Write Ratio:</strong> Drag the slider to set your workload split (e.g., 90% Reads / 10% Writes). The values always sum to 100%.</li>
+              <li><strong>Query Complexity:</strong> Select whether your typical queries perform simple (1-2 joins), medium (3-4 joins), or complex (5+ joins) operations.</li>
+              <li><strong>Storage Cost Sensitivity:</strong> Choose Low (ample budget/storage), Medium (standard cloud hosting), or High (constrained disk/RAM capacity).</li>
+              <li><strong>Data Consistency Criticality:</strong> Choose Low (eventual consistency ok), Medium (application-level checks), or High (strict financial-grade ACID transactions).</li>
+            </ul>
+          </div>
+
+          <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 space-y-1">
+            <strong className="text-slate-900 dark:text-white block font-bold">
+              Step C: What Each Button Does
+            </strong>
+            <ul className="space-y-1.5 pt-1">
+              <li className="flex items-start space-x-2">
+                <span className="p-1 rounded bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 font-bold shrink-0 mt-0.5">
+                  <Zap className="w-3 h-3" />
+                </span>
+                <div>
+                  <strong>Calculate Recommendation:</strong> Recomputes the 0-10 scores, updates the Radar/Bar chart, and produces an architectural verdict.
+                </div>
+              </li>
+              <li className="flex items-start space-x-2">
+                <span className="p-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold shrink-0 mt-0.5">
+                  <RotateCcw className="w-3 h-3" />
+                </span>
+                <div>
+                  <strong>Reset to Defaults:</strong> Clears custom inputs back to standard baseline parameters.
+                </div>
+              </li>
+              <li className="flex items-start space-x-2">
+                <span className="p-1 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold shrink-0 mt-0.5">
+                  <Layers className="w-3 h-3" />
+                </span>
+                <div>
+                  <strong>Load Scenario:</strong> Clicking any preset button (e.g. <em>Small OLTP App</em>, <em>Analytics Dashboard</em>, or <em>Mixed Workload</em>) auto-fills all 5 inputs to demonstrate how distinct real-world workloads behave.
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 space-y-1">
+            <strong className="text-slate-900 dark:text-white block font-bold">
+              Step D: How to Interpret the Scores, Chart, and Recommendation
+            </strong>
+            <p>
+              The <strong>Radar Chart</strong> visualizes both architectures across a 0 to 10 scale (where 10 is optimal). The larger the polygon area, the better that architecture fits your workload.
+            </p>
+            <ul className="list-disc pl-5 space-y-0.5 pt-1">
+              <li><strong>Prefer Denormalization:</strong> Read throughput wins decisively outweigh the moderate write/storage cost.</li>
+              <li><strong>Prefer Normalization:</strong> High write volume or strict consistency demands make single-source-of-truth 3NF the safest and fastest choice.</li>
+              <li><strong>Hybrid:</strong> Workload has conflicting needs; use 3NF for core tables and selective materialized views or Redis caching for read queries.</li>
+            </ul>
+          </div>
+
+          <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 space-y-1">
+            <strong className="text-slate-900 dark:text-white block font-bold">
+              Step E: How to Use the Download Button
+            </strong>
+            <p>
+              Click <strong>“Download”</strong> (in the top navbar or next to the recommendation banner). You can export an executive PDF report, a Microsoft Word document (.doc), Markdown (.md), or Plain Text (.txt) summary containing your inputs, dimension scores, chart data, and key takeaways.
             </p>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-            <strong className="text-sky-600 dark:text-sky-400 block mb-1">3. Table Cardinalities & Join Depth:</strong>
-            <p className="text-slate-600 dark:text-slate-300">
-              Set the number of rows in primary and dimension tables, plus the number of tables joined per normalized query (2 to 5 joins).
+          <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 space-y-1">
+            <strong className="text-slate-900 dark:text-white block font-bold">
+              Step F: How to Toggle Day / Night Mode
+            </strong>
+            <p>
+              Click the <strong>Sun / Moon icon</strong> in the top-right header to switch between light mode (crisp daylight contrast) and dark mode (reduced eye strain). Your choice is saved automatically in your browser's local storage.
             </p>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-            <strong className="text-sky-600 dark:text-sky-400 block mb-1">4. Storage Tier & Buffer Hit Ratio:</strong>
-            <p className="text-slate-600 dark:text-slate-300">
-              Select NVMe SSD, Cloud SSD, or Mechanical HDD, and toggle the database page buffer pool hit ratio from 50% to 99%.
-            </p>
-          </div>
         </div>
       </div>
 
-      {/* Step 3: Controls & Buttons */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-        <div className="flex items-center space-x-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-          <span className="w-7 h-7 rounded-lg bg-sky-600 text-white flex items-center justify-center font-bold text-sm">3</span>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-            What Each Button & Control Does
-          </h2>
-        </div>
+      {/* 3. Short FAQ */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-7 shadow-sm space-y-4">
+        <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+          <span className="w-6 h-6 rounded-full bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 flex items-center justify-center text-xs font-bold">3</span>
+          <span>Frequently Asked Questions (FAQ)</span>
+        </h2>
 
         <div className="space-y-3 text-xs">
-          <div className="flex items-start space-x-3">
-            <span className="p-1.5 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-bold shrink-0">
-              <Play className="w-3.5 h-3.5" />
-            </span>
-            <div>
-              <strong className="text-slate-900 dark:text-white">Tour Demo:</strong>
-              <p className="text-slate-600 dark:text-slate-400">
-                Launches an interactive guided walkthrough modal that demonstrates the end-to-end workflow of the website.
-              </p>
-            </div>
+          <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30">
+            <strong className="text-slate-900 dark:text-white block mb-1">
+              Q: What if my read/write ratio changes over time?
+            </strong>
+            <p className="text-slate-600 dark:text-slate-400">
+              Database workloads frequently shift as companies scale (e.g., transitioning from early feature development to read-heavy user browsing). You can use the Live "What-If" slider to observe where your application crosses the threshold from Normalization to Denormalization.
+            </p>
           </div>
 
-          <div className="flex items-start space-x-3">
-            <span className="p-1.5 rounded-md bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 font-bold shrink-0">
-              <Download className="w-3.5 h-3.5" />
-            </span>
-            <div>
-              <strong className="text-slate-900 dark:text-white">Download:</strong>
-              <p className="text-slate-600 dark:text-slate-400">
-                Opens the export dialog offering PDF, Word (.doc), Structured Markdown/Text, and JSON downloads of the complete audit report.
-              </p>
-            </div>
+          <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30">
+            <strong className="text-slate-900 dark:text-white block mb-1">
+              Q: Does denormalization always guarantee faster queries?
+            </strong>
+            <p className="text-slate-600 dark:text-slate-400">
+              Not always! If your dataset exceeds available RAM, denormalized tables have wider rows, meaning fewer rows fit in the database page buffer cache. This causes frequent disk seeks, counteracting the read benefit.
+            </p>
           </div>
 
-          <div className="flex items-start space-x-3">
-            <span className="p-1.5 rounded-md bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 font-bold shrink-0">
-              <Sun className="w-3.5 h-3.5" />
-            </span>
-            <div>
-              <strong className="text-slate-900 dark:text-white">Day/Night Mode Toggle:</strong>
-              <p className="text-slate-600 dark:text-slate-400">
-                Switches between light and dark visual themes with high contrast and accessibility compliance.
-              </p>
-            </div>
+          <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30">
+            <strong className="text-slate-900 dark:text-white block mb-1">
+              Q: How does a Hybrid approach work in modern production?
+            </strong>
+            <p className="text-slate-600 dark:text-slate-400">
+              Most high-scale systems (like Uber, Netflix, Amazon) keep the primary database in 3NF for ACID safety, but stream changes via change data capture (CDC) or event queues to read-optimized denormalized stores (Elasticsearch, Redis, or ClickHouse).
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Step 4: How Processing Takes Place */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-        <div className="flex items-center space-x-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-          <span className="w-7 h-7 rounded-lg bg-sky-600 text-white flex items-center justify-center font-bold text-sm">4</span>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-            How the Processing Takes Place
-          </h2>
-        </div>
-        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-          Whenever an input slider or preset is changed:
+      {/* 4. Test Scenarios Section */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-7 shadow-sm space-y-3">
+        <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+          <span className="w-6 h-6 rounded-full bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 flex items-center justify-center text-xs font-bold">4</span>
+          <span>Verified Test Scenarios</span>
+        </h2>
+        <p className="text-xs text-slate-600 dark:text-slate-400">
+          The scoring engine has been verified against 3 primary baseline test cases:
         </p>
-        <ol className="list-decimal pl-5 space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
-          <li>The <strong>Storage Model</strong> computes total bytes and disk inflation including secondary B-tree indexes.</li>
-          <li>The <strong>Read Latency Engine</strong> models CPU join traversal costs and physical page cache misses.</li>
-          <li>The <strong>Write Latency Engine</strong> computes update fanout, multi-row rewrite amplification, and lock contention delays.</li>
-          <li>The <strong>Crossover Engine</strong> computes the break-even read percentage where Normalized and Denormalized latencies intersect.</li>
-          <li>The <strong>Anomaly Model</strong> assigns an integrity risk score (0 to 100) based on write frequency and synchronization locks.</li>
-        </ol>
-      </div>
 
-      {/* Step 5: How to Interpret the Output */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-        <div className="flex items-center space-x-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-          <span className="w-7 h-7 rounded-lg bg-sky-600 text-white flex items-center justify-center font-bold text-sm">5</span>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-            How to Interpret the Output
-          </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div className="p-3 rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50/30 dark:bg-emerald-950/20">
+            <strong className="text-emerald-800 dark:text-emerald-300 block font-bold mb-1">
+              Case 1: Analytics Dashboard
+            </strong>
+            <div className="text-[11px] text-slate-600 dark:text-slate-400 space-y-0.5">
+              <div>• 10M rows, 95% Reads / 5% Writes</div>
+              <div>• Complex Joins, Low Consistency</div>
+              <div className="font-bold text-emerald-700 dark:text-emerald-300 pt-1">
+                ✓ Output: Prefer Denormalization
+              </div>
+            </div>
+          </div>
+
+          <div className="p-3 rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50/30 dark:bg-rose-950/20">
+            <strong className="text-rose-800 dark:text-rose-300 block font-bold mb-1">
+              Case 2: Small OLTP App
+            </strong>
+            <div className="text-[11px] text-slate-600 dark:text-slate-400 space-y-0.5">
+              <div>• 50K rows, 30% Reads / 70% Writes</div>
+              <div>• Simple Queries, High Consistency</div>
+              <div className="font-bold text-rose-700 dark:text-rose-300 pt-1">
+                ✓ Output: Prefer Normalization
+              </div>
+            </div>
+          </div>
+
+          <div className="p-3 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/30 dark:bg-blue-950/20">
+            <strong className="text-blue-800 dark:text-blue-300 block font-bold mb-1">
+              Case 3: Mixed Workload
+            </strong>
+            <div className="text-[11px] text-slate-600 dark:text-slate-400 space-y-0.5">
+              <div>• 2M rows, 70% Reads / 30% Writes</div>
+              <div>• Medium Joins, Medium Consistency</div>
+              <div className="font-bold text-blue-700 dark:text-blue-300 pt-1">
+                ✓ Output: Hybrid
+              </div>
+            </div>
+          </div>
         </div>
-        <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
-          <li className="flex items-start space-x-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-            <span><strong>Read Latency Card:</strong> Shows how many milliseconds each read takes. If speedup is &gt; 2.0x, denormalization is giving strong read wins.</span>
-          </li>
-          <li className="flex items-start space-x-2">
-            <CheckCircle2 className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-            <span><strong>Write Latency Card:</strong> Shows the write amplification factor. If penalty is &gt; 3.0x, updating parent entities will choke the database.</span>
-          </li>
-          <li className="flex items-start space-x-2">
-            <CheckCircle2 className="w-4 h-4 text-sky-500 shrink-0 mt-0.5" />
-            <span><strong>Crossover Chart:</strong> If your current read ratio is to the right of the break-even point, denormalization provides a net latency advantage.</span>
-          </li>
-          <li className="flex items-start space-x-2">
-            <CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-            <span><strong>Anomaly Score:</strong> Normalized is always 0 (safe). A score above 50 indicates high danger of data corruption during network glitches or worker timeouts.</span>
-          </li>
-        </ul>
       </div>
 
     </div>

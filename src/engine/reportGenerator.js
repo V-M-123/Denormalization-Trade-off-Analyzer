@@ -1,86 +1,77 @@
 /**
  * Report Generator Module
- * Supports PDF, DOC (Word), Text/Markdown, and JSON formats.
+ * Generates downloadable reports in PDF, Word (.doc), Markdown (.md), and Text (.txt).
  */
 
 import jsPDF from 'jspdf';
 
-export function formatReportMarkdown(metrics) {
-  const { inputs, storage, latency, throughput, anomaly, recommendation, hardware } = metrics;
-  
+export function formatReportMarkdown(evaluation) {
+  const { inputs, breakdown, scores, recommendation, timestamp } = evaluation;
+
   return `# Denormalization Trade-off Analysis Report
-**Generated on:** ${new Date().toLocaleString()}  
-**Application:** Denormalization Trade-off Analyzer (DBMS Architecture Optimizer)  
-**Guided By:** Dr. Swaminathan A, Assistant Professor  
+
+**Application:** Denormalization Trade-off Analyzer  
+**Generated On:** ${new Date(timestamp).toLocaleString()}  
+**Academic Supervisor:** Dr. Swaminathan A, Assistant Professor  
 
 ---
 
-## 1. Executive Summary & Verdict
-- **Recommendation:** **${recommendation.verdict}**
-- **Recommended Strategy:** ${recommendation.strategy}
-- **Analysis Summary:** ${recommendation.summary}
+## 1. Architectural Verdict & Recommendation
 
-### Key Action Items:
-${recommendation.actionItems.map(item => `- ${item}`).join('\n')}
+- **Verdict:** **${recommendation.verdict}**
+- **Normalized 3NF Average Score:** ${scores.normalizedAverage} / 10
+- **Denormalized Average Score:** ${scores.denormalizedAverage} / 10
+
+### Executive Summary
+${recommendation.explanation}
+
+### Key Takeaways
+- **Why this recommendation was made:**  
+  ${recommendation.keyTakeaways.why}
+- **What could trigger a change in recommendation:**  
+  ${recommendation.keyTakeaways.whatCouldChange}
 
 ---
 
-## 2. Workload & System Inputs
-| Parameter | Value | Unit / Description |
+## 2. Workload Input Parameters
+
+| Input Parameter | Value | Assessment Context |
 | :--- | :--- | :--- |
-| Read QPS | ${inputs.readQps.toLocaleString()} | Queries per second (${latency.readRatioPercent}%) |
-| Write QPS | ${inputs.writeQps.toLocaleString()} | Writes/Updates per second (${latency.writeRatioPercent}%) |
-| Primary Table Rows (e.g. Orders) | ${inputs.table1Rows.toLocaleString()} | High-frequency entity |
-| Dimension Table 1 Rows (e.g. Customers) | ${inputs.table2Rows.toLocaleString()} | Normalized parent entity |
-| Child Table Rows (e.g. Order Items) | ${inputs.table3Rows.toLocaleString()} | Normalized child records |
-| Normalized Query Join Depth | ${inputs.joinDepth} | Tables joined per read |
-| Base Row Size (Norm) | ${inputs.normRowSizeBytes} | Bytes per record |
-| Denormalized Row Size | ${inputs.denormRowSizeBytes} | Bytes per record (includes duplicated fields) |
-| Hardware Tier | ${hardware.label} | Base seek: ${hardware.baseSeekMs}ms, Page fetch: ${hardware.diskPageFetchMs}ms |
-| Buffer Pool Hit Ratio | ${(inputs.bufferCacheHitRatio * 100).toFixed(0)}% | In-memory page cache efficiency |
-| Index Overhead | ${inputs.indexOverheadPercent}% | Secondary indexes footprint |
-| Client Concurrency | ${inputs.concurrency} | Simultaneous active connections |
-| Synchronization Lock Level | ${anomaly.syncLockLevel.toUpperCase()} | Concurrency control strategy |
+| **Estimated Table Row Count** | ${Number(inputs.rowCount).toLocaleString()} rows | ${inputs.rowCount > 10000000 ? 'Exceeds typical RAM buffer pool size' : 'Fits well within memory buffer'} |
+| **Read / Write Ratio** | ${inputs.readPercent}% Reads / ${inputs.writePercent}% Writes | ${inputs.readPercent >= 80 ? 'Heavily Read-Dominant' : inputs.writePercent >= 40 ? 'Write-Heavy Transactional' : 'Balanced Mixed Workload'} |
+| **Query Complexity Level** | ${inputs.queryComplexity.toUpperCase()} | ${inputs.queryComplexity === 'complex' ? 'Deep multi-table joins (>4 joins)' : 'Simple single/dual join access'} |
+| **Storage Cost Sensitivity** | ${inputs.storageCostSensitivity.toUpperCase()} | Sensitivity to disk and RAM page bloat |
+| **Data Consistency Criticality**| ${inputs.dataConsistencyCriticality.toUpperCase()} | Tolerance to update and sync anomalies |
 
 ---
 
-## 3. Comparative Performance & Trade-off Metrics
-| Metric | Normalized (3NF / BCNF) | Denormalized | Trade-off Delta |
-| :--- | :--- | :--- | :--- |
-| **Read Latency (Single Query)** | **${latency.normReadLatencyMs} ms** | **${latency.denormReadLatencyMs} ms** | **${latency.readSpeedupFactor}x faster read** |
-| **Write Latency (Per Update)** | **${latency.normWriteLatencyMs} ms** | **${latency.denormWriteLatencyMs} ms** | **${latency.writePenaltyFactor}x write penalty** |
-| **Effective Weighted Latency** | **${latency.normOverallLatencyMs} ms** | **${latency.denormOverallLatencyMs} ms** | ${latency.denormOverallLatencyMs < latency.normOverallLatencyMs ? 'Denormalized wins' : 'Normalized wins'} |
-| **Write Amplification Factor** | **1.00x** (Single row update) | **${latency.denormWriteAmplification}x** | Fanout = ${anomaly.fanoutRatio} updates/parent |
-| **Total Disk Storage** | **${storage.normStorageGb} GB** | **${storage.denormStorageGb} GB** | **+${(storage.storageInflationFactor * 100 - 100).toFixed(0)}% storage bloat** |
-| **Redundant Storage Overhead** | **0.00 GB** | **${storage.redundantStorageGb} GB** | Pure duplicated columns |
-| **Estimated Monthly Storage Cost** | **$${storage.normMonthlyCost}** | **$${storage.denormMonthlyCost}** | Based on ${hardware.label} |
-| **Max Sustainable Throughput** | **${throughput.normMaxQps.toLocaleString()} QPS** | **${throughput.denormMaxQps.toLocaleString()} QPS** | At concurrency ${throughput.concurrency} |
-| **Data Anomaly Risk Index** | **0 / 100** (Guaranteed ACID 3NF) | **${anomaly.denormAnomalyRisk} / 100** | ${anomaly.denormAnomalyRisk > 50 ? 'High Inconsistency Risk' : 'Moderate Inconsistency Risk'} |
-| **Break-Even Crossover Point** | **${latency.breakEvenPercent}% Reads** | -- | Workload read threshold |
+## 3. 5-Dimension Scored Trade-off Breakdown (0 - 10 Scale)
+
+| Dimension | Normalized (3NF) | Denormalized | Technical Justification |
+| :--- | :---: | :---: | :--- |
+| **Read Performance** | **${breakdown.readPerformance.normalized} / 10** | **${breakdown.readPerformance.denormalized} / 10** | ${breakdown.readPerformance.justification} |
+| **Write Performance** | **${breakdown.writePerformance.normalized} / 10** | **${breakdown.writePerformance.denormalized} / 10** | ${breakdown.writePerformance.justification} |
+| **Storage Efficiency** | **${breakdown.storageEfficiency.normalized} / 10** | **${breakdown.storageEfficiency.denormalized} / 10** | ${breakdown.storageEfficiency.justification} |
+| **Data Integrity** | **${breakdown.dataIntegrity.normalized} / 10** | **${breakdown.dataIntegrity.denormalized} / 10** | ${breakdown.dataIntegrity.justification} |
+| **Query Simplicity** | **${breakdown.queryComplexity.normalized} / 10** | **${breakdown.queryComplexity.denormalized} / 10** | ${breakdown.queryComplexity.justification} |
 
 ---
 
-## 4. Mathematical Processing Steps & Formulas
-1. **Normalized Storage**:
-   $$\\text{Size}_{\\text{norm}} = (N_1 \\times S_1) + (N_2 \\times S_2) + (N_3 \\times S_3) + \\text{IndexFootprint} = ${storage.normStorageGb}\\text{ GB}$$
+## 4. Architectural Implementation Notes
 
-2. **Denormalized Storage & Redundancy**:
-   $$\\text{Size}_{\\text{denorm}} = N_1 \\times S_{\\text{denorm}} + \\text{IndexFootprint} = ${storage.denormStorageGb}\\text{ GB}$$
-   $$\\text{Redundant Overhead} = N_1 \\times (S_{\\text{denorm}} - S_{\\text{norm}}) = ${storage.redundantStorageGb}\\text{ GB}$$
+1. **When Normalization Wins:**
+   - Single-source-of-truth avoids data drift.
+   - Low write amplification prevents multi-row database lock contention.
+   - Foreign key constraints provide hardware-level atomicity.
 
-3. **Read Latency ($\\\\mathcal{L}_{\\text{read}}$)**:
-   - *Normalized*: $T_{\\text{seek}} + (\\text{JoinDepth} - 1) \\times T_{\\text{join\\_cpu}} + \\text{PagesTouched} \\times (1 - \\text{HitRatio}) \\times T_{\\text{page\\_io}} = ${latency.normReadLatencyMs}\\text{ ms}$
-   - *Denormalized*: $T_{\\text{seek}} + T_{\\text{single\\_table}} + \\text{PagesTouched} \\times (1 - \\text{HitRatio}) \\times T_{\\text{page\\_io}} = ${latency.denormReadLatencyMs}\\text{ ms}$
+2. **When Denormalization Wins:**
+   - Pre-joining attributes eliminates nested-loop and hash joins at read time.
+   - Aggregates (like count and sums) are pre-calculated.
+   - Fits high-read OLAP and analytics pipelines where writes are batch-loaded.
 
-4. **Write Amplification & Update Latency ($\\\\mathcal{L}_{\\text{write}}$)**:
-   - Fanout: $N_1 / N_2 = ${anomaly.fanoutRatio} records affected per parent update.
-   - Write Amplification: $1 + (\\text{Fanout} \\times 0.4) = ${latency.denormWriteAmplification}x.
-   - Normalized Write: ${latency.normWriteLatencyMs}\\text{ ms} vs Denormalized Write: ${latency.denormWriteLatencyMs}\\text{ ms}.
-
-5. **Effective Weighted Latency**:
-   $$\\\\mathcal{L}_{\\text{avg}} = (R_{\\%} \\times \\\\mathcal{L}_{\\text{read}}) + (W_{\\%} \\times \\\\mathcal{L}_{\\text{write}})$$
-   - Normalized: ${latency.normOverallLatencyMs} ms
-   - Denormalized: ${latency.denormOverallLatencyMs} ms
+3. **Hybrid Compromise (The Practical Industry Standard):**
+   - Retain 3NF for core transactional state.
+   - Use Materialized Views or CQRS (Command Query Responsibility Segregation) with Redis caches for hot read paths.
 
 ---
 *Report generated by Denormalization Trade-off Analyzer.*
@@ -99,8 +90,8 @@ export function downloadText(filename, content, mimeType = 'text/plain;charset=u
   URL.revokeObjectURL(url);
 }
 
-export function downloadWordDocument(metrics) {
-  const md = formatReportMarkdown(metrics);
+export function downloadWordDocument(evaluation) {
+  const md = formatReportMarkdown(evaluation);
   const htmlContent = `
     <!DOCTYPE html>
     <html>
@@ -111,12 +102,11 @@ export function downloadWordDocument(metrics) {
         body { font-family: Calibri, Arial, sans-serif; line-height: 1.5; color: #1e293b; padding: 40px; }
         h1 { color: #0284c7; border-bottom: 2px solid #0284c7; padding-bottom: 8px; }
         h2 { color: #0f172a; margin-top: 24px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; }
+        h3 { color: #334155; margin-top: 16px; }
         table { border-collapse: collapse; width: 100%; margin: 16px 0; }
         th, td { border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; }
         th { background-color: #f1f5f9; color: #0f172a; }
         tr:nth-child(even) { background-color: #f8fafc; }
-        .highlight { background-color: #e0f2fe; font-weight: bold; }
-        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; background: #0284c7; color: white; font-weight: bold; }
       </style>
     </head>
     <body>
@@ -146,155 +136,161 @@ export function downloadWordDocument(metrics) {
   URL.revokeObjectURL(url);
 }
 
-export function downloadPdfReport(metrics) {
+export function downloadPdfReport(evaluation) {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
     format: 'a4'
   });
 
-  const { inputs, storage, latency, throughput, anomaly, recommendation, hardware } = metrics;
-  
+  const { inputs, breakdown, scores, recommendation, timestamp } = evaluation;
+
   // Header Banner
-  doc.setFillColor(2, 132, 199); // Brand blue
+  doc.setFillColor(8, 145, 178); // Cyan / Teal Brand Color
   doc.rect(0, 0, 210, 24, 'F');
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(16);
+  doc.setFontSize(15);
   doc.setFont('helvetica', 'bold');
-  doc.text('Denormalization Trade-off Analysis Report', 14, 12);
-  doc.setFontSize(9);
+  doc.text('Denormalization Trade-off Analysis Report', 14, 11);
+  doc.setFontSize(8.5);
   doc.setFont('helvetica', 'normal');
-  doc.text('Guided By: Dr. Swaminathan A, Assistant Professor | DBMS Architectural Optimizer', 14, 18);
+  doc.text('Guided By: Dr. Swaminathan A, Assistant Professor | Academic Project Review', 14, 17);
 
-  // Date & Subtitle
-  doc.setTextColor(100, 116, 139);
+  // Timestamp
   doc.setFontSize(8);
-  doc.text(`Generated: ${new Date().toLocaleString()}`, 140, 18);
+  doc.text(`Generated: ${new Date(timestamp).toLocaleString()}`, 135, 17);
 
-  let y = 34;
+  let y = 32;
 
   // Verdict Box
   doc.setFillColor(240, 249, 255);
   doc.setDrawColor(186, 230, 253);
-  doc.roundedRect(14, y, 182, 26, 2, 2, 'FD');
+  doc.roundedRect(14, y, 182, 28, 2, 2, 'FD');
 
   doc.setTextColor(15, 23, 42);
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
-  doc.text(`Recommendation: ${recommendation.verdict}`, 18, y + 8);
+  doc.text(`Recommendation: ${recommendation.verdict}`, 18, y + 7);
 
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(51, 65, 85);
-  const summaryLines = doc.splitTextToSize(recommendation.summary, 174);
-  doc.text(summaryLines, 18, y + 14);
+  const summaryLines = doc.splitTextToSize(recommendation.explanation, 174);
+  doc.text(summaryLines, 18, y + 13);
 
-  y += 34;
+  y += 35;
 
-  // Section 1: Comparative Table
-  doc.setFontSize(12);
+  // Section 1: User Inputs
+  doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(15, 23, 42);
-  doc.text('1. Performance & Trade-off Comparison', 14, y);
-  y += 6;
+  doc.text('1. Evaluated Workload Characteristics', 14, y);
+  y += 5;
 
-  // Table Header
-  doc.setFillColor(241, 245, 249);
-  doc.rect(14, y, 182, 7, 'F');
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(71, 85, 105);
-  doc.text('Metric', 18, y + 5);
-  doc.text('Normalized (3NF/BCNF)', 75, y + 5);
-  doc.text('Denormalized', 125, y + 5);
-  doc.text('Trade-off Impact', 165, y + 5);
-  y += 7;
-
-  const rows = [
-    ['Read Latency', `${latency.normReadLatencyMs} ms`, `${latency.denormReadLatencyMs} ms`, `${latency.readSpeedupFactor}x Faster Read`],
-    ['Write Latency', `${latency.normWriteLatencyMs} ms`, `${latency.denormWriteLatencyMs} ms`, `${latency.writePenaltyFactor}x Write Penalty`],
-    ['Effective Latency', `${latency.normOverallLatencyMs} ms`, `${latency.denormOverallLatencyMs} ms`, latency.denormOverallLatencyMs < latency.normOverallLatencyMs ? 'Denorm Wins' : 'Norm Wins'],
-    ['Write Amplification', '1.0x (Isolated)', `${latency.denormWriteAmplification}x`, `Fanout: ${anomaly.fanoutRatio}x`],
-    ['Total Disk Storage', `${storage.normStorageGb} GB`, `${storage.denormStorageGb} GB`, `+${(storage.storageInflationFactor * 100 - 100).toFixed(0)}% Bloat`],
-    ['Redundant Overhead', '0.00 GB', `${storage.redundantStorageGb} GB`, 'Duplicate columns'],
-    ['Max Throughput', `${throughput.normMaxQps.toLocaleString()} QPS`, `${throughput.denormMaxQps.toLocaleString()} QPS`, `Conc: ${throughput.concurrency}`],
-    ['Anomaly Risk Index', '0 / 100 (Safe 3NF)', `${anomaly.denormAnomalyRisk} / 100`, `${anomaly.syncLockLevel.toUpperCase()} lock`],
-    ['Break-Even Point', `${latency.breakEvenPercent}% Reads`, '--', 'Workload Threshold'],
+  const inputRows = [
+    ['Estimated Row Count', `${Number(inputs.rowCount).toLocaleString()} rows`, 'Query Complexity', inputs.queryComplexity.toUpperCase()],
+    ['Read / Write Ratio', `${inputs.readPercent}% R / ${inputs.writePercent}% W`, 'Storage Sensitivity', inputs.storageCostSensitivity.toUpperCase()],
+    ['Consistency Criticality', inputs.dataConsistencyCriticality.toUpperCase(), 'Norm vs Denorm Avg', `${scores.normalizedAverage} vs ${scores.denormalizedAverage} / 10`],
   ];
 
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  rows.forEach((row, i) => {
-    if (i % 2 === 1) {
-      doc.setFillColor(248, 250, 252);
-      doc.rect(14, y, 182, 6, 'F');
-    }
-    doc.setTextColor(30, 41, 59);
-    doc.text(row[0], 18, y + 4.5);
-    doc.text(row[1], 75, y + 4.5);
-    doc.text(row[2], 125, y + 4.5);
-    doc.text(row[3], 165, y + 4.5);
-    y += 6;
-  });
-
-  y += 8;
-
-  // Section 2: Input Parameters
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(15, 23, 42);
-  doc.text('2. Workload & Architectural Parameters', 14, y);
-  y += 6;
-
-  const paramRows = [
-    ['Read Workload', `${inputs.readQps.toLocaleString()} QPS (${latency.readRatioPercent}%)`, 'Buffer Pool Hit Ratio', `${(inputs.bufferCacheHitRatio * 100).toFixed(0)}%`],
-    ['Write Workload', `${inputs.writeQps.toLocaleString()} QPS (${latency.writeRatioPercent}%)`, 'Hardware Tier', hardware.label],
-    ['Primary Table Rows', inputs.table1Rows.toLocaleString(), 'Index Overhead', `${inputs.indexOverheadPercent}%`],
-    ['Dimension Table Rows', inputs.table2Rows.toLocaleString(), 'Join Depth (Normalized)', `${inputs.joinDepth} Tables`],
-    ['Normalized Row Size', `${inputs.normRowSizeBytes} Bytes`, 'Denormalized Row Size', `${inputs.denormRowSizeBytes} Bytes`],
-  ];
-
-  paramRows.forEach(r => {
+  inputRows.forEach(r => {
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(100, 116, 139);
     doc.text(`${r[0]}:`, 18, y + 4);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(15, 23, 42);
-    doc.text(r[1], 55, y + 4);
+    doc.text(r[1], 58, y + 4);
 
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(100, 116, 139);
     doc.text(`${r[2]}:`, 110, y + 4);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(15, 23, 42);
-    doc.text(r[3], 148, y + 4);
+    doc.text(r[3], 152, y + 4);
     y += 5.5;
   });
 
-  y += 8;
-
-  // Section 3: Recommended Action Items
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(15, 23, 42);
-  doc.text('3. Recommended Architecture & DBA Action Items', 14, y);
   y += 6;
 
-  doc.setFont('helvetica', 'normal');
+  // Section 2: 5-Dimension Scored Breakdown
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(15, 23, 42);
+  doc.text('2. 5-Dimension Scored Breakdown (0 - 10 Scale)', 14, y);
+  y += 5;
+
+  // Table Header
+  doc.setFillColor(241, 245, 249);
+  doc.rect(14, y, 182, 6.5, 'F');
   doc.setFontSize(8);
-  doc.setTextColor(51, 65, 85);
-  recommendation.actionItems.forEach(item => {
-    const lines = doc.splitTextToSize(`•  ${item}`, 178);
-    doc.text(lines, 18, y + 3);
-    y += (lines.length * 4.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(71, 85, 105);
+  doc.text('Dimension', 18, y + 4.5);
+  doc.text('Normalized', 65, y + 4.5);
+  doc.text('Denormalized', 92, y + 4.5);
+  doc.text('Technical Justification', 122, y + 4.5);
+  y += 6.5;
+
+  const dimensionRows = [
+    ['Read Performance', `${breakdown.readPerformance.normalized}/10`, `${breakdown.readPerformance.denormalized}/10`, breakdown.readPerformance.justification],
+    ['Write Performance', `${breakdown.writePerformance.normalized}/10`, `${breakdown.writePerformance.denormalized}/10`, breakdown.writePerformance.justification],
+    ['Storage Efficiency', `${breakdown.storageEfficiency.normalized}/10`, `${breakdown.storageEfficiency.denormalized}/10`, breakdown.storageEfficiency.justification],
+    ['Data Integrity', `${breakdown.dataIntegrity.normalized}/10`, `${breakdown.dataIntegrity.denormalized}/10`, breakdown.dataIntegrity.justification],
+    ['Query Simplicity', `${breakdown.queryComplexity.normalized}/10`, `${breakdown.queryComplexity.denormalized}/10`, breakdown.queryComplexity.justification],
+  ];
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  dimensionRows.forEach((row, i) => {
+    if (i % 2 === 1) {
+      doc.setFillColor(248, 250, 252);
+      doc.rect(14, y, 182, 10, 'F');
+    }
+    doc.setTextColor(30, 41, 59);
+    doc.setFont('helvetica', 'bold');
+    doc.text(row[0], 18, y + 4.5);
+    doc.setFont('helvetica', 'normal');
+    doc.text(row[1], 68, y + 4.5);
+    doc.text(row[2], 95, y + 4.5);
+
+    const justLines = doc.splitTextToSize(row[3], 72);
+    doc.text(justLines, 122, y + 3.5);
+    y += 10;
   });
 
+  y += 6;
+
+  // Section 3: Key Takeaways
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(15, 23, 42);
+  doc.text('3. Key Architectural Takeaways', 14, y);
+  y += 5;
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(15, 23, 42);
+  doc.text('• Why this recommendation was made:', 18, y + 3);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(51, 65, 85);
+  const whyLines = doc.splitTextToSize(recommendation.keyTakeaways.why, 174);
+  doc.text(whyLines, 22, y + 7.5);
+  y += (whyLines.length * 4) + 8;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(15, 23, 42);
+  doc.text('• What could change the recommendation:', 18, y + 3);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(51, 65, 85);
+  const whatLines = doc.splitTextToSize(recommendation.keyTakeaways.whatCouldChange, 174);
+  doc.text(whatLines, 22, y + 7.5);
+
   // Footer
-  doc.setFontSize(7);
+  doc.setFontSize(7.5);
   doc.setTextColor(148, 163, 184);
-  doc.text('Denormalization Trade-off Analyzer | Academic Evaluation Report', 14, 287);
-  doc.text('Page 1 of 1', 180, 287);
+  doc.text('Denormalization Trade-off Analyzer | Academic Project Evaluation Report', 14, 287);
+  doc.text('Page 1 of 1', 185, 287);
 
   doc.save(`denormalization-report-${Date.now()}.pdf`);
 }

@@ -47,8 +47,8 @@ export default function TradeoffCharts({ metrics }) {
       {
         label: 'Normalized 3NF Latency (ms)',
         data: sweepData.map(d => d.normLatency),
-        borderColor: '#0284c7',
-        backgroundColor: 'rgba(2, 132, 199, 0.1)',
+        borderColor: isDark ? '#22d3ee' : '#0891b2',
+        backgroundColor: isDark ? 'rgba(34, 211, 238, 0.12)' : 'rgba(8, 145, 178, 0.12)',
         fill: false,
         tension: 0.25,
         pointRadius: 3,
@@ -119,7 +119,7 @@ export default function TradeoffCharts({ metrics }) {
           (metrics.storage.normStorageGb * 0.78).toFixed(1),
           (metrics.storage.normStorageGb * 0.78).toFixed(1),
         ],
-        backgroundColor: '#3b82f6',
+        backgroundColor: isDark ? '#06b6d4' : '#0891b2',
       },
       {
         label: 'Redundant Duplicated Columns (GB)',
@@ -135,7 +135,7 @@ export default function TradeoffCharts({ metrics }) {
           (metrics.storage.normStorageGb * 0.22).toFixed(1),
           (metrics.storage.denormStorageGb - metrics.storage.redundantStorageGb - (metrics.storage.normStorageGb * 0.78)).toFixed(1),
         ],
-        backgroundColor: '#8b5cf6',
+        backgroundColor: '#14b8a6',
       }
     ]
   };
@@ -180,7 +180,7 @@ export default function TradeoffCharts({ metrics }) {
           metrics.latency.normWriteLatencyMs,
           metrics.latency.normOverallLatencyMs,
         ],
-        backgroundColor: '#0284c7',
+        backgroundColor: isDark ? '#06b6d4' : '#0891b2',
       },
       {
         label: 'Denormalized',
@@ -225,10 +225,10 @@ export default function TradeoffCharts({ metrics }) {
     <div className="space-y-6">
       
       {/* Top Chart: Crossover Sweep Curve with Break-even Badge */}
-      <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800 gap-2">
+      <div className="glass-panel p-5 rounded-2xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-200/50 dark:border-white/10 gap-2">
           <div className="flex items-center space-x-2">
-            <div className="p-2 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400">
+            <div className="p-2 rounded-xl bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
               <TrendingUp className="w-5 h-5" />
             </div>
             <div>
@@ -241,9 +241,9 @@ export default function TradeoffCharts({ metrics }) {
             </div>
           </div>
 
-          <div className="flex items-center space-x-2 bg-slate-50 dark:bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
-            <span className="text-xs text-slate-500 dark:text-slate-400">Break-Even Threshold:</span>
-            <span className="text-xs font-bold text-sky-600 dark:text-sky-400">
+          <div className="flex items-center space-x-2 glass-pill px-3 py-1.5 rounded-full">
+            <span className="text-xs text-slate-600 dark:text-slate-400">Break-Even Threshold:</span>
+            <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400">
               {metrics.latency.breakEvenPercent}% Reads
             </span>
           </div>
@@ -253,11 +253,11 @@ export default function TradeoffCharts({ metrics }) {
           <Line data={lineChartData} options={lineChartOptions} />
         </div>
 
-        <div className="mt-3 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between">
+        <div className="mt-4 text-xs text-slate-600 dark:text-slate-300 glass-card p-3 rounded-xl flex items-center justify-between">
           <span>
             💡 <strong>Observation:</strong> At workloads below <strong>{metrics.latency.breakEvenPercent}% Reads</strong>, Normalized 3NF wins due to low write amplification. Above <strong>{metrics.latency.breakEvenPercent}% Reads</strong>, Denormalization wins by eliminating join overhead.
           </span>
-          <span className="hidden md:inline font-mono text-[11px] text-sky-600 dark:text-sky-400">
+          <span className="hidden md:inline font-mono text-[11px] text-cyan-600 dark:text-cyan-400 ml-2 whitespace-nowrap">
             Current: {metrics.latency.readRatioPercent}% R / {metrics.latency.writeRatioPercent}% W
           </span>
         </div>
@@ -267,9 +267,9 @@ export default function TradeoffCharts({ metrics }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Storage Breakdown */}
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="flex items-center space-x-2 pb-3 mb-3 border-b border-slate-100 dark:border-slate-800">
-            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+        <div className="glass-panel p-5 rounded-2xl">
+          <div className="flex items-center space-x-2 pb-3 mb-3 border-b border-slate-200/50 dark:border-white/10">
+            <div className="p-2 rounded-xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
               <PieChart className="w-4 h-4" />
             </div>
             <div>
@@ -284,15 +284,15 @@ export default function TradeoffCharts({ metrics }) {
           <div className="h-64 w-full">
             <Bar data={storageBarData} options={storageBarOptions} />
           </div>
-          <div className="mt-2 text-center text-xs text-slate-500 dark:text-slate-400">
-            Storage Inflation: <strong>{metrics.storage.storageInflationFactor}x</strong> (+{metrics.storage.redundantStorageGb} GB redundant data)
+          <div className="mt-3 text-center text-xs text-slate-600 dark:text-slate-400 glass-pill py-1 rounded-lg">
+            Storage Inflation: <strong className="text-indigo-600 dark:text-indigo-400">{metrics.storage.storageInflationFactor}x</strong> (+{metrics.storage.redundantStorageGb} GB redundant data)
           </div>
         </div>
 
         {/* Latency Comparison */}
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="flex items-center space-x-2 pb-3 mb-3 border-b border-slate-100 dark:border-slate-800">
-            <div className="p-2 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400">
+        <div className="glass-panel p-5 rounded-2xl">
+          <div className="flex items-center space-x-2 pb-3 mb-3 border-b border-slate-200/50 dark:border-white/10">
+            <div className="p-2 rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/20">
               <Layers className="w-4 h-4" />
             </div>
             <div>
@@ -307,8 +307,8 @@ export default function TradeoffCharts({ metrics }) {
           <div className="h-64 w-full">
             <Bar data={latencyCompData} options={latencyCompOptions} />
           </div>
-          <div className="mt-2 text-center text-xs text-slate-500 dark:text-slate-400">
-            Weighted Latency: <strong>{metrics.latency.normOverallLatencyMs} ms</strong> (Norm) vs <strong>{metrics.latency.denormOverallLatencyMs} ms</strong> (Denorm)
+          <div className="mt-3 text-center text-xs text-slate-600 dark:text-slate-400 glass-pill py-1 rounded-lg">
+            Weighted Latency: <strong className="text-cyan-600 dark:text-cyan-400">{metrics.latency.normOverallLatencyMs} ms</strong> (Norm) vs <strong className="text-rose-600 dark:text-rose-400">{metrics.latency.denormOverallLatencyMs} ms</strong> (Denorm)
           </div>
         </div>
 

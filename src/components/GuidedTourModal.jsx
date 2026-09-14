@@ -1,21 +1,18 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   X, 
   ArrowRight, 
   ArrowLeft, 
-  Check, 
   Compass, 
   Sliders, 
   Zap, 
   AlertTriangle, 
-  Download,
-  BookOpen
+  Download
 } from 'lucide-react';
 
 export default function GuidedTourModal({ isOpen, onClose, onNavigateTab }) {
   const [currentStep, setCurrentStep] = useState(0);
-
-  if (!isOpen) return null;
 
   const tourSteps = [
     {
@@ -82,83 +79,94 @@ export default function GuidedTourModal({ isOpen, onClose, onNavigateTab }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 relative">
-        
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        {/* Step Indicator */}
-        <div className="flex items-center space-x-1.5 mb-4">
-          {tourSteps.map((_, i) => (
-            <div 
-              key={i} 
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === currentStep 
-                  ? 'w-8 bg-sky-600' 
-                  : i < currentStep 
-                    ? 'w-3 bg-sky-300 dark:bg-sky-800' 
-                    : 'w-3 bg-slate-200 dark:bg-slate-700'
-              }`}
-            />
-          ))}
-          <span className="text-[11px] font-mono text-slate-400 pl-2">
-            {currentStep + 1} / {tourSteps.length}
-          </span>
-        </div>
-
-        {/* Header with Icon */}
-        <div className="flex items-center space-x-3 mb-3">
-          <div className="p-2.5 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
-            <StepIcon className="w-6 h-6" />
-          </div>
-          <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">
-              {step.subtitle}
-            </span>
-            <h3 className="text-base font-black text-slate-900 dark:text-white">
-              {step.title}
-            </h3>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-          {step.description}
-        </div>
-
-        {/* Highlight Note */}
-        <div className="p-3 rounded-xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800/80 text-xs text-sky-900 dark:text-sky-300 mb-6 flex items-start space-x-2">
-          <span className="font-bold text-sky-600 shrink-0">💡 Note:</span>
-          <span>{step.highlight}</span>
-        </div>
-
-        {/* Navigation Buttons */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
-          <button
-            onClick={handlePrev}
-            disabled={currentStep === 0}
-            className="flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 disabled:opacity-30 transition-colors"
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.94, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.94, y: 10 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="glass-panel rounded-3xl max-w-lg w-full p-6 shadow-2xl relative border border-white/40 dark:border-white/10"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Previous</span>
-          </button>
+            
+            {/* Close Button */}
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 p-2 rounded-full glass-pill text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
 
-          <button
-            onClick={handleNext}
-            className="flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white shadow-sm transition-all"
-          >
-            <span>{currentStep === tourSteps.length - 1 ? 'Finish Tour' : 'Next Step'}</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+            {/* Step Indicator */}
+            <div className="flex items-center space-x-1.5 mb-4">
+              {tourSteps.map((_, i) => (
+                <div 
+                  key={i} 
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    i === currentStep 
+                      ? 'w-8 bg-cyan-600 shadow-xs shadow-cyan-500/50' 
+                      : i < currentStep 
+                        ? 'w-3 bg-cyan-400 dark:bg-cyan-700' 
+                        : 'w-3 bg-slate-200/80 dark:bg-slate-700/80'
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* Step Header */}
+            <div className="flex items-center space-x-3 mb-3">
+              <div className="p-2.5 rounded-xl bg-gradient-to-tr from-cyan-500 to-teal-600 text-white shadow-md shadow-cyan-500/25 ring-1 ring-white/30">
+                <StepIcon className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">
+                  Step {currentStep + 1} of {tourSteps.length}
+                </span>
+                <h3 className="font-extrabold text-base text-slate-900 dark:text-white leading-tight">
+                  {step.title}
+                </h3>
+              </div>
+            </div>
+
+            {/* Step Content */}
+            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+              {step.description}
+            </p>
+
+            {/* Highlight Banner */}
+            <div className="p-3.5 rounded-2xl glass-card border border-cyan-400/30 text-xs text-slate-700 dark:text-slate-200 mb-6 flex items-start space-x-2">
+              <span className="font-bold text-cyan-600 dark:text-cyan-400 shrink-0">💡 Note:</span>
+              <p>{step.highlight}</p>
+            </div>
+
+            {/* Navigation Actions */}
+            <div className="flex items-center justify-between pt-2 border-t border-slate-200/50 dark:border-white/10">
+              <button
+                onClick={handlePrev}
+                disabled={currentStep === 0}
+                className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold glass-pill transition-all ${
+                  currentStep === 0 
+                    ? 'opacity-40 cursor-not-allowed text-slate-400' 
+                    : 'text-slate-700 dark:text-slate-200 hover:bg-white/60 dark:hover:bg-slate-800/60'
+                }`}
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Previous</span>
+              </button>
+
+              <button
+                onClick={handleNext}
+                className="flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-cyan-600 hover:bg-cyan-700 text-white shadow-md shadow-cyan-500/25 border border-cyan-400/40 transition-all"
+              >
+                <span>{currentStep === tourSteps.length - 1 ? 'Finish Tour' : 'Next Step'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+          </motion.div>
         </div>
-
-      </div>
-    </div>
+      )}
+    </AnimatePresence>
   );
 }

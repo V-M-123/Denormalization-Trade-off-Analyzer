@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserCheck, Award, GraduationCap, Mail, Edit3, Check } from 'lucide-react';
+import { UserCheck, Award, GraduationCap, Edit3, Check } from 'lucide-react';
 
 export default function DevelopedBy() {
   const [isEditing, setIsEditing] = useState(false);
@@ -7,19 +7,19 @@ export default function DevelopedBy() {
     {
       name: 'Student Lead',
       regNo: '21BCE1001',
-      role: 'Database Modeling & Core Cost Engine',
+      role: 'Database Modeling & Trade-off Scoring Engine',
       photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80',
     },
     {
       name: 'Team Member 2',
       regNo: '21BCE1042',
-      role: 'UI/UX Design & Anomaly Simulator',
+      role: 'Interactive UI/UX & Chart Visualizations',
       photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80',
     },
     {
       name: 'Team Member 3',
       regNo: '21BCE1095',
-      role: 'Automated Testing & Report Exporter',
+      role: 'Verification Test Suite & Report Exporter',
       photo: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=80',
     },
   ]);
@@ -37,79 +37,84 @@ export default function DevelopedBy() {
       
       {/* Title Header */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 text-xs font-semibold">
+        <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-cyan-100 dark:bg-cyan-950 text-cyan-800 dark:text-cyan-300 text-xs font-semibold">
           <UserCheck className="w-3.5 h-3.5" />
-          <span>Project Team & Guidance</span>
+          <span>Project Contributors & Guidance</span>
         </div>
-        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
           Developed By
         </h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
-          Academic Project Development for Database Management Systems — Digital Assignment 1 (DA1)
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
+          Academic development for Database Management Systems — Digital Assignment Review
         </p>
       </div>
 
-      {/* SUPERVISOR GUIDANCE CARD (MANDATORY REQUIREMENT) */}
-      <div className="bg-gradient-to-r from-sky-600 via-indigo-600 to-blue-700 text-white rounded-2xl p-6 sm:p-8 shadow-md relative overflow-hidden">
+      {/* GUIDED BY SECTION (MANDATORY REQUIREMENT) */}
+      <div className="bg-gradient-to-r from-cyan-600 via-teal-600 to-emerald-700 text-white rounded-2xl p-6 sm:p-8 shadow-sm relative overflow-hidden">
         <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6 text-center sm:text-left">
           
-          <div className="w-24 h-24 rounded-2xl bg-white/20 backdrop-blur border-2 border-white/40 flex items-center justify-center text-white shrink-0 shadow-inner">
-            <GraduationCap className="w-12 h-12 text-white" />
+          <div className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur border border-white/40 flex items-center justify-center text-white shrink-0 shadow-inner">
+            <GraduationCap className="w-10 h-10 text-white" />
           </div>
 
           <div className="space-y-1">
-            <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded text-[11px] font-bold bg-white/20 text-white uppercase tracking-wider">
+            <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/20 text-white uppercase tracking-wider border border-white/30">
               <Award className="w-3.5 h-3.5 mr-1" />
-              Faculty Supervisor
+              Project Supervisor
             </span>
-            <div className="text-xs uppercase tracking-widest text-sky-200 font-semibold pt-1">
+            <div className="text-xs uppercase tracking-widest text-cyan-100 font-semibold pt-1">
               Guided By
             </div>
             <h2 className="text-2xl font-black tracking-tight text-white">
               Dr. Swaminathan A
             </h2>
-            <p className="text-sm font-medium text-sky-100">
+            <p className="text-sm font-medium text-cyan-100">
               Assistant Professor
             </p>
-            <p className="text-xs text-sky-200/90 pt-1">
+            <p className="text-xs text-cyan-200/90 pt-0.5">
               School of Computer Science and Engineering (SCOPE)
             </p>
           </div>
         </div>
       </div>
 
-      {/* TEAM MEMBERS SECTION */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+      {/* STUDENT MEMBERS SECTION */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-7 shadow-sm space-y-6">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
           <div>
-            <h3 className="text-lg font-black text-slate-900 dark:text-white">
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">
               Student Project Contributors
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Click "Edit Details" if you want to update student names or registration numbers
+              Core contributors responsible for database modeling, analysis algorithms, and visualization
             </p>
           </div>
           <button
             onClick={() => setIsEditing(!isEditing)}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            className="flex items-center space-x-1 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
           >
-            {isEditing ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Edit3 className="w-3.5 h-3.5" />}
-            <span>{isEditing ? 'Done Editing' : 'Edit Details'}</span>
+            {isEditing ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Edit3 className="w-3.5 h-3.5 text-slate-500" />}
+            <span>{isEditing ? 'Save Details' : 'Edit Details'}</span>
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {teamMembers.map((member, index) => (
             <div 
               key={index}
-              className="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-5 border border-slate-200 dark:border-slate-700 text-center space-y-3 transition-all hover:shadow-md"
+              className="rounded-xl border border-slate-200 dark:border-slate-800 p-5 text-center space-y-3 bg-slate-50/50 dark:bg-slate-800/30"
             >
               {/* Photo */}
-              <div className="relative w-24 h-24 mx-auto rounded-full overflow-hidden border-3 border-sky-500/30 shadow-sm">
+              <div className="relative w-20 h-20 mx-auto rounded-full overflow-hidden ring-4 ring-cyan-500/20 shadow-xs">
                 <img 
                   src={member.photo} 
                   alt={member.name} 
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Fallback to avatar placeholder if network image fails
+                    e.target.style.display = 'none';
+                    e.target.parentNode.classList.add('flex', 'items-center', 'justify-center', 'bg-cyan-100', 'text-cyan-700');
+                  }}
                 />
               </div>
 
@@ -122,7 +127,7 @@ export default function DevelopedBy() {
                       type="text" 
                       value={member.name}
                       onChange={(e) => handleMemberChange(index, 'name', e.target.value)}
-                      className="w-full p-1.5 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-xs font-semibold text-slate-800 dark:text-slate-100"
+                      className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-100"
                     />
                   </div>
                   <div>
@@ -131,7 +136,7 @@ export default function DevelopedBy() {
                       type="text" 
                       value={member.regNo}
                       onChange={(e) => handleMemberChange(index, 'regNo', e.target.value)}
-                      className="w-full p-1.5 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-xs font-mono text-slate-800 dark:text-slate-100"
+                      className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono text-slate-800 dark:text-slate-100"
                     />
                   </div>
                   <div>
@@ -140,19 +145,19 @@ export default function DevelopedBy() {
                       type="text" 
                       value={member.role}
                       onChange={(e) => handleMemberChange(index, 'role', e.target.value)}
-                      className="w-full p-1.5 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-100"
+                      className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100"
                     />
                   </div>
                 </div>
               ) : (
                 <div>
-                  <h4 className="font-bold text-base text-slate-900 dark:text-white">
+                  <h4 className="font-bold text-sm text-slate-900 dark:text-white">
                     {member.name}
                   </h4>
-                  <div className="inline-block px-2.5 py-0.5 mt-1 rounded bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 text-xs font-mono font-semibold">
+                  <div className="inline-block px-2.5 py-0.5 mt-1 rounded-full bg-cyan-100 dark:bg-cyan-950 text-cyan-800 dark:text-cyan-300 text-xs font-mono font-semibold">
                     Reg No: {member.regNo}
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
                     {member.role}
                   </p>
                 </div>

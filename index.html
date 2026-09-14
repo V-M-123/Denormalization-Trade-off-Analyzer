@@ -1,14 +1,771 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230284c7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><ellipse cx='12' cy='5' rx='9' ry='3'></ellipse><path d='M21 12c0 1.66-4 3-9 3s-9-1.34-9-3'></path><path d='M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5'></path></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Denormalization Trade-off Analyzer | DBMS Architectural Optimization</title>
-    <meta name="description" content="Interactive analytical cost modeling and simulation engine for Normalized (3NF/BCNF) vs Denormalized database architectures." />
-  </head>
-  <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen">
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="en" data-theme="night">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com; img-src 'self' data: https:;">
+  <title>Denormalization Trade-off Analyzer</title>
+  <meta name="description" content="An interactive architectural evaluation tool comparing Relational Normalization (1NF-3NF) vs Denormalization.">
+
+  <!-- Inline theme initialization to prevent flash-of-wrong-theme -->
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem('denorm_theme');
+        if (saved === 'day' || saved === 'night') {
+          document.documentElement.setAttribute('data-theme', saved);
+        } else {
+          document.documentElement.setAttribute('data-theme', 'night');
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- Google Fonts: Space Grotesk (Headings), Inter (UI), Fira Mono (Code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <!-- External CDNs: Chart.js & jsPDF -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="site-header" role="banner">
+    <div class="container nav-container">
+      
+      <!-- Brand / Logo -->
+      <a href="#analyzer" class="brand-link" aria-label="Denormalization Trade-off Analyzer Home">
+        <span class="brand-badge" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        </span>
+        <span>Denormalization Analyzer</span>
+      </a>
+
+      <!-- Primary Navigation Tabs -->
+      <nav class="nav-links" role="navigation" aria-label="Main Navigation">
+        <button type="button" class="nav-link active" data-nav-target="tab-analyzer" aria-selected="true">Analyzer</button>
+        <button type="button" class="nav-link" data-nav-target="tab-learn" aria-selected="false">Learn</button>
+        <button type="button" class="nav-link" data-nav-target="tab-developed-by" aria-selected="false">Developed By</button>
+        <button type="button" class="nav-link" data-nav-target="tab-help" aria-selected="false">Help</button>
+        <button type="button" class="nav-link" data-nav-target="tab-tests" aria-selected="false">Dev/Test Panel</button>
+      </nav>
+
+      <!-- Actions: Download & Theme Toggle -->
+      <div class="nav-actions">
+        <button type="button" class="btn-accent-pill" data-action="open-download" title="Download Report">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Download Report</span>
+        </button>
+
+        <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Day/Night Mode" aria-pressed="true">
+          <!-- Populated by js/theme.js -->
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: var(--space-8); padding-bottom: var(--space-12);" role="main">
+
+    <!-- ================================================================= -->
+    <!-- TAB 1: ANALYZER (HOME)                                            -->
+    <!-- ================================================================= -->
+    <section id="tab-analyzer" class="tab-section" aria-labelledby="analyzer-heading">
+      
+      <!-- Hero Header -->
+      <div style="margin-bottom: var(--space-8);">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span>DBMS Architectural Optimization Engine</span>
+        </div>
+        <h1 id="analyzer-heading" style="margin-bottom: var(--space-2);">
+          Denormalization Trade-off Analyzer
+        </h1>
+        <p style="max-width: 720px; font-size: 1.1rem; color: var(--text-subhead);">
+          Input workload characteristics to evaluate Relational Normalization (1NF–3NF) against Denormalized structures across 5 core engineering dimensions.
+        </p>
+      </div>
+
+      <div class="grid-2" style="align-items: start;">
+        
+        <!-- Left Column: Input Form -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 style="font-size: 1.15rem;">Workload Characteristics</h2>
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">Configure table scale, query access patterns, and ACID criticality.</p>
+            </div>
+          </div>
+
+          <!-- Presets Row -->
+          <div style="margin-bottom: var(--space-5);">
+            <span style="font-size: 12px; font-weight: 600; color: var(--text-eyebrow); display: block; margin-bottom: 6px;">
+              Quick Load Scenarios:
+            </span>
+            <div id="preset-chips-container" class="preset-chip-row">
+              <!-- Populated by js/scenarios.js -->
+            </div>
+          </div>
+
+          <form id="analyzer-form" novalidate>
+            
+            <!-- 1. Row Count -->
+            <div class="form-group">
+              <div class="form-label-row">
+                <label for="input-row-count" class="form-label">1. Estimated Table Row Count</label>
+                <span class="form-sublabel">Supports K/M/B (e.g. 50K, 2M, 50M)</span>
+              </div>
+              <input type="text" id="input-row-count" class="form-input" placeholder="e.g. 10M" value="10M" required>
+              
+              <!-- Quick row chips -->
+              <div class="preset-chip-row">
+                <button type="button" class="preset-chip" data-row-preset="10K">10K</button>
+                <button type="button" class="preset-chip" data-row-preset="500K">500K</button>
+                <button type="button" class="preset-chip" data-row-preset="2M">2M</button>
+                <button type="button" class="preset-chip" data-row-preset="10M">10M</button>
+                <button type="button" class="preset-chip" data-row-preset="50M">50M</button>
+              </div>
+              <div id="error-rowCount" class="error-message" style="display: none;"></div>
+            </div>
+
+            <!-- 2. Read / Write Ratio -->
+            <div class="form-group">
+              <div class="form-label-row">
+                <label for="input-read-slider" class="form-label">2. Read / Write Ratio</label>
+                <span style="font-family: var(--font-mono); font-size: 12px; font-weight: 600;">
+                  <span id="display-read-val" style="color: var(--accent);">95%</span> Reads / 
+                  <span id="display-write-val" style="color: var(--text-muted);">5%</span> Writes
+                </span>
+              </div>
+              
+              <div class="slider-container">
+                <input type="range" id="input-read-slider" class="range-slider" min="0" max="100" value="95" aria-label="Read Percentage Slider">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 6px;">
+                  <span>0% (Write-Heavy)</span>
+                  <span>50% / 50%</span>
+                  <span>100% (Read-Only)</span>
+                </div>
+              </div>
+
+              <!-- Paired numerical inputs for precise entry -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-top: var(--space-2);">
+                <div>
+                  <label for="input-read-ratio" style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 2px;">Read %</label>
+                  <input type="number" id="input-read-ratio" class="form-input" min="0" max="100" value="95">
+                </div>
+                <div>
+                  <label for="input-write-ratio" style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 2px;">Write % (100 - Read)</label>
+                  <input type="number" id="input-write-ratio" class="form-input" min="0" max="100" value="5">
+                </div>
+              </div>
+              <div id="error-ratioSum" class="error-message" style="display: none;"></div>
+            </div>
+
+            <!-- 3. Query Complexity -->
+            <div class="form-group">
+              <div class="form-label-row">
+                <label class="form-label">3. Query Complexity Level</label>
+              </div>
+              <div class="segmented-group" role="radiogroup" aria-label="Query Complexity">
+                <button type="button" class="segmented-btn" data-segmented-group="queryComplexity" data-value="simple">Simple (1-2 joins)</button>
+                <button type="button" class="segmented-btn" data-segmented-group="queryComplexity" data-value="medium">Medium (3-4 joins)</button>
+                <button type="button" class="segmented-btn active" data-segmented-group="queryComplexity" data-value="complex" aria-checked="true">Complex (5+ joins)</button>
+              </div>
+              <div id="error-queryComplexity" class="error-message" style="display: none;"></div>
+            </div>
+
+            <!-- 4. Storage Cost Sensitivity -->
+            <div class="form-group">
+              <div class="form-label-row">
+                <label class="form-label">4. Storage Cost Sensitivity</label>
+              </div>
+              <div class="segmented-group" role="radiogroup" aria-label="Storage Cost Sensitivity">
+                <button type="button" class="segmented-btn active" data-segmented-group="storageCostSensitivity" data-value="low" aria-checked="true">Low (Ample Budget)</button>
+                <button type="button" class="segmented-btn" data-segmented-group="storageCostSensitivity" data-value="medium">Medium (Standard)</button>
+                <button type="button" class="segmented-btn" data-segmented-group="storageCostSensitivity" data-value="high">High (Tight RAM/Disk)</button>
+              </div>
+              <div id="error-storageCostSensitivity" class="error-message" style="display: none;"></div>
+            </div>
+
+            <!-- 5. Data Consistency Criticality -->
+            <div class="form-group">
+              <div class="form-label-row">
+                <label class="form-label">5. Data Consistency Criticality</label>
+              </div>
+              <div class="segmented-group" role="radiogroup" aria-label="Data Consistency Criticality">
+                <button type="button" class="segmented-btn active" data-segmented-group="dataConsistencyCriticality" data-value="low" aria-checked="true">Low (Eventual OK)</button>
+                <button type="button" class="segmented-btn" data-segmented-group="dataConsistencyCriticality" data-value="medium">Medium (Standard)</button>
+                <button type="button" class="segmented-btn" data-segmented-group="dataConsistencyCriticality" data-value="high">High (Strict ACID)</button>
+              </div>
+              <div id="error-dataConsistencyCriticality" class="error-message" style="display: none;"></div>
+            </div>
+
+            <!-- Live What-If Checkbox & Buttons -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: var(--space-5); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle);">
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-body); cursor: pointer;">
+                <input type="checkbox" id="live-what-if-toggle" checked style="accent-color: var(--accent);">
+                <span>Live "What-If" Slider Updates</span>
+              </label>
+
+              <div style="display: flex; gap: var(--space-2);">
+                <button type="button" id="btn-reset" class="btn-ghost-outline" style="padding: 6px 14px; min-height: 36px; font-size: 13px;">Reset</button>
+                <button type="submit" id="btn-calculate" class="btn-accent-pill" style="padding: 8px 18px; min-height: 36px; font-size: 13px;">Calculate</button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- Right Column: Results & Visualization -->
+        <div>
+          
+          <!-- Recommendation Banner -->
+          <div id="recommendation-banner" class="recommendation-banner prefer-denormalization" aria-live="polite">
+            <span id="recommendation-verdict-tag" class="verdict-tag denorm">Prefer Denormalization</span>
+            <h2 id="recommendation-heading" style="font-size: 1.5rem; margin-bottom: var(--space-2);">
+              Prefer Denormalization
+            </h2>
+            <p id="recommendation-explanation" style="font-size: 13px; color: var(--text-body); line-height: 1.6;">
+              <!-- Populated by js/scoring.js -->
+            </p>
+
+            <div style="margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--border-subtle); display: grid; grid-template-columns: 1fr; gap: var(--space-3);">
+              <div>
+                <strong style="font-size: 11px; text-transform: uppercase; color: var(--text-eyebrow); display: block; margin-bottom: 2px;">
+                  📌 Key Takeaway: Why this recommendation was made
+                </strong>
+                <p id="takeaway-why" style="font-size: 12px; color: var(--text-body); margin-bottom: 0;">
+                  <!-- Populated by js/scoring.js -->
+                </p>
+              </div>
+              <div>
+                <strong style="font-size: 11px; text-transform: uppercase; color: var(--text-eyebrow); display: block; margin-bottom: 2px;">
+                  ⚡ What could change the recommendation
+                </strong>
+                <p id="takeaway-flip" style="font-size: 12px; color: var(--text-body); margin-bottom: 0;">
+                  <!-- Populated by js/scoring.js -->
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 style="font-size: 1.1rem;">Trade-off Visualization (0–10 Scale)</h3>
+                <span style="font-size: 11px; color: var(--text-muted);">Comparing Normalized (3NF) vs. Denormalized across the 5 dimensions</span>
+              </div>
+              <button type="button" id="btn-toggle-chart-type" class="btn-ghost-outline" style="padding: 4px 12px; min-height: 32px; font-size: 12px;">
+                Switch to Bar Chart
+              </button>
+            </div>
+
+            <div style="position: relative; height: 280px; width: 100%;">
+              <canvas id="tradeoff-chart"></canvas>
+            </div>
+          </div>
+
+          <!-- 5-Dimension Score Cards Grid -->
+          <div id="dimension-cards-container" class="dimension-cards-grid">
+            <!-- Populated by js/scoring.js -->
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Schema Snippets Section (Code Window Cards with Traffic Lights) -->
+      <div style="margin-top: var(--space-12);">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span>Physical Schema Snippets</span>
+        </div>
+        <h2>Normalized 3NF vs. Denormalized Wide Table</h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: var(--space-4);">
+          Observe how relational normal forms decompose tables to isolate dependencies, whereas denormalization collapses entities into pre-joined flat structures.
+        </p>
+
+        <div class="grid-2">
+          
+          <!-- Code Window 1: Normalized 3NF -->
+          <div class="code-window">
+            <div class="code-window-topbar">
+              <div class="traffic-dots">
+                <span class="traffic-dot dot-red"></span>
+                <span class="traffic-dot dot-yellow"></span>
+                <span class="traffic-dot dot-green"></span>
+              </div>
+              <span class="code-window-title">schema_normalized_3nf.sql</span>
+            </div>
+            <pre class="code-window-content"><code><span class="code-comment">-- Normalized (3NF): Zero duplication, single source of truth</span>
+<span class="code-keyword">CREATE TABLE</span> Customers (
+  customer_id <span class="code-keyword">INT PRIMARY KEY</span>,
+  customer_name <span class="code-string">VARCHAR(100)</span>,
+  shipping_city <span class="code-string">VARCHAR(50)</span>
+);
+
+<span class="code-keyword">CREATE TABLE</span> Orders (
+  order_id <span class="code-keyword">INT PRIMARY KEY</span>,
+  customer_id <span class="code-keyword">INT REFERENCES</span> Customers(customer_id),
+  order_date <span class="code-string">DATE</span>
+);
+
+<span class="code-keyword">CREATE TABLE</span> Order_Items (
+  item_id <span class="code-keyword">INT PRIMARY KEY</span>,
+  order_id <span class="code-keyword">INT REFERENCES</span> Orders(order_id),
+  product_id <span class="code-keyword">INT REFERENCES</span> Products(product_id),
+  quantity <span class="code-keyword">INT</span>, unit_price <span class="code-keyword">DECIMAL(10,2)</span>
+);
+
+<span class="code-comment">-- Read requires expensive multi-table joins:</span>
+<span class="code-keyword">SELECT</span> o.order_id, c.customer_name, i.quantity, i.unit_price
+<span class="code-keyword">FROM</span> Orders o
+<span class="code-keyword">JOIN</span> Customers c <span class="code-keyword">ON</span> o.customer_id = c.customer_id
+<span class="code-keyword">JOIN</span> Order_Items i <span class="code-keyword">ON</span> o.order_id = i.order_id
+<span class="code-keyword">WHERE</span> o.order_id = 4501;</code></pre>
+          </div>
+
+          <!-- Code Window 2: Denormalized Wide Table -->
+          <div class="code-window">
+            <div class="code-window-topbar">
+              <div class="traffic-dots">
+                <span class="traffic-dot dot-red"></span>
+                <span class="traffic-dot dot-yellow"></span>
+                <span class="traffic-dot dot-green"></span>
+              </div>
+              <span class="code-window-title">schema_denormalized_flat.sql</span>
+            </div>
+            <pre class="code-window-content"><code><span class="code-comment">-- Denormalized: Pre-joined columns for high-throughput reads</span>
+<span class="code-keyword">CREATE TABLE</span> Orders_Denormalized (
+  order_id <span class="code-keyword">INT PRIMARY KEY</span>,
+  customer_id <span class="code-keyword">INT</span>,
+  customer_name <span class="code-string">VARCHAR(100)</span>, <span class="code-comment">/* Duplicated */</span>
+  shipping_city <span class="code-string">VARCHAR(50)</span>,  <span class="code-comment">/* Duplicated */</span>
+  total_item_count <span class="code-keyword">INT</span>,       <span class="code-comment">/* Pre-computed summary */</span>
+  total_amount <span class="code-keyword">DECIMAL(10,2)</span>, <span class="code-comment">/* Pre-computed summary */</span>
+  order_date <span class="code-string">DATE</span>
+);
+
+<span class="code-comment">-- Read requires ZERO joins (direct clustered seek):</span>
+<span class="code-keyword">SELECT</span> order_id, customer_name, total_item_count, total_amount
+<span class="code-keyword">FROM</span> Orders_Denormalized
+<span class="code-keyword">WHERE</span> order_id = 4501;
+
+<span class="code-comment">/* Write Penalty: Modifying Customer Name forces an UPDATE 
+   across thousands of historical orders, locking rows. */</span></code></pre>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- TAB 2: LEARN                                                      -->
+    <!-- ================================================================= -->
+    <section id="tab-learn" class="tab-section sr-only" style="display: none;" aria-labelledby="learn-heading">
+      
+      <div style="margin-bottom: var(--space-8);">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span>Core Educational Guide</span>
+        </div>
+        <h1 id="learn-heading" style="margin-bottom: var(--space-2);">
+          Normalization vs. Denormalization Concepts
+        </h1>
+        <p style="max-width: 720px; font-size: 1.1rem; color: var(--text-subhead);">
+          Master relational decomposition, normal forms (1NF through 3NF), and the engineering compromises behind intentional redundancy.
+        </p>
+      </div>
+
+      <!-- Subsection 1: Concept Explanation -->
+      <div class="card" style="margin-bottom: var(--space-6);">
+        <div class="card-header">
+          <div>
+            <h2 style="font-size: 1.25rem;">1. Concept Explanation</h2>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">What normalization is, why we denormalize, and the core trade-offs.</p>
+          </div>
+        </div>
+
+        <div style="font-size: 14px; line-height: 1.6; color: var(--text-body);">
+          <h3 style="font-size: 1rem; color: var(--text-primary); margin-bottom: var(--space-2);">What is Database Normalization?</h3>
+          <p>
+            Database normalization is a systematic design technique pioneered by E.F. Codd to organize relational tables to eliminate data redundancy and prevent data modification anomalies (Insertion, Update, and Deletion anomalies).
+          </p>
+
+          <div class="grid-3" style="margin: var(--space-4) 0;">
+            <div style="padding: var(--space-3); border-radius: var(--radius-card); background: var(--surface-code); border: 1px solid var(--border);">
+              <strong style="color: var(--accent); font-size: 13px; display: block; margin-bottom: 4px;">1NF (First Normal Form)</strong>
+              <p style="font-size: 12px; margin-bottom: 0;">Eliminates duplicate columns and repeating groups; ensures every column contains atomic (indivisible) values and each record has a unique primary key.</p>
+            </div>
+            <div style="padding: var(--space-3); border-radius: var(--radius-card); background: var(--surface-code); border: 1px solid var(--border);">
+              <strong style="color: var(--accent); font-size: 13px; display: block; margin-bottom: 4px;">2NF (Second Normal Form)</strong>
+              <p style="font-size: 12px; margin-bottom: 0;">Satisfies 1NF and removes partial dependencies: all non-key attributes must depend on the entire primary key, not just a portion of a composite key.</p>
+            </div>
+            <div style="padding: var(--space-3); border-radius: var(--radius-card); background: var(--surface-code); border: 1px solid var(--border);">
+              <strong style="color: var(--accent); font-size: 13px; display: block; margin-bottom: 4px;">3NF (Third Normal Form)</strong>
+              <p style="font-size: 12px; margin-bottom: 0;">Satisfies 2NF and removes transitive dependencies: non-key attributes must not depend on other non-key attributes ("every non-key depends strictly on the key").</p>
+            </div>
+          </div>
+
+          <h3 style="font-size: 1rem; color: var(--text-primary); margin-top: var(--space-6); margin-bottom: var(--space-2);">What is Denormalization and Why is it Used?</h3>
+          <p>
+            Denormalization is the intentional introduction of redundant data or pre-aggregated columns into a normalized database. Its primary motivation is <strong>read query acceleration</strong>. By pre-joining parent attributes into child records or maintaining cached counters, read queries avoid expensive relational multi-table joins, nested loops, and hash aggregations.
+          </p>
+
+          <h3 style="font-size: 1rem; color: var(--text-primary); margin-top: var(--space-6); margin-bottom: var(--space-2);">The Five Core Trade-offs</h3>
+          <ul style="list-style-type: disc; padding-left: 20px; font-size: 13px; space-y: 8px;">
+            <li><strong>Read Performance:</strong> Denormalization accelerates reads by eliminating table joins; however, if datasets exceed available RAM, wider rows diminish buffer pool efficiency.</li>
+            <li><strong>Write Performance:</strong> Normalization provides ultra-fast single-row updates. Denormalization causes severe write amplification because updating one entity requires updating redundant copies across multiple rows.</li>
+            <li><strong>Storage Efficiency:</strong> Normalized schemas occupy minimal disk space. Denormalization duplicates string columns and bloats secondary B-tree indexes.</li>
+            <li><strong>Data Integrity:</strong> Normalization guarantees ACID compliance via foreign keys. Denormalization risks update anomalies and data drift if synchronizer jobs fail.</li>
+            <li><strong>Query Complexity:</strong> Denormalized queries are simple flat SELECTs. Normalized queries require complex multi-table joins.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Subsection 2: Animated Educational Video -->
+      <div class="card" style="margin-bottom: var(--space-6);">
+        <div class="card-header">
+          <div>
+            <h2 style="font-size: 1.25rem;">2. Animated Educational Video</h2>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">Visual walkthrough explaining relational decomposition and denormalization.</p>
+          </div>
+        </div>
+
+        <div style="position: relative; aspect-ratio: 16/9; width: 100%; border-radius: var(--radius-code); overflow: hidden; background: #000; border: 1px solid var(--border);">
+          <iframe 
+            style="width: 100%; height: 100%; border: none;"
+            src="https://www.youtube-nocookie.com/embed/GFQaEYEc8_8?rel=0" 
+            title="Database Normalization vs Denormalization Animated Guide"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+          </iframe>
+        </div>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: var(--space-2); margin-bottom: 0;">
+          <strong>Video Caption:</strong> This animated tutorial explains relational table decomposition from 1NF to 3NF, the risk of insertion/update anomalies, and the architectural tipping points where high-scale systems choose denormalization.
+        </p>
+      </div>
+
+      <!-- Subsection 3: References -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 style="font-size: 1.25rem;">3. Authoritative References & Further Reading</h2>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">Textbooks, articles, and research sources used in developing this analyzer.</p>
+          </div>
+        </div>
+
+        <ul style="list-style-type: disc; padding-left: 20px; font-size: 13px; line-height: 1.8;">
+          <li>
+            <a href="https://www.geeksforgeeks.org/denormalization-in-databases/" target="_blank" rel="noopener noreferrer">
+              <strong>GeeksforGeeks:</strong> Denormalization in Databases — Overview, Techniques, Advantages & Trade-offs
+            </a>
+          </li>
+          <li>
+            <a href="https://www.exasol.com/resource/data-architecture-guide/" target="_blank" rel="noopener noreferrer">
+              <strong>Exasol:</strong> Database Architecture Guide — Normalization vs. Analytical Denormalization
+            </a>
+          </li>
+          <li>
+            <a href="https://celerdata.com/blog/denormalization-vs-normalization" target="_blank" rel="noopener noreferrer">
+              <strong>CelerData:</strong> Normalization vs. Denormalization in Modern High-Concurrency Data Warehouses
+            </a>
+          </li>
+          <li>
+            <span><strong>Database System Concepts (7th Edition)</strong> — Abraham Silberschatz, Henry F. Korth, S. Sudarshan (McGraw-Hill Education).</span>
+          </li>
+          <li>
+            <span><strong>Designing Data-Intensive Applications</strong> — Martin Kleppmann (O'Reilly Media). Chapters on Data Models & Query Engines.</span>
+          </li>
+          <li>
+            <span><strong>Data Cube: A Relational Aggregation Operator</strong> — Jim Gray et al., Data Mining and Knowledge Discovery, 1997.</span>
+          </li>
+          <li>
+            <a href="https://www.youtube.com/watch?v=GFQaEYEc8_8" target="_blank" rel="noopener noreferrer">
+              <strong>Video Source:</strong> Database Normalization and Denormalization Explained (YouTube)
+            </a>
+          </li>
+        </ul>
+      </div>
+
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- TAB 3: DEVELOPED BY                                               -->
+    <!-- ================================================================= -->
+    <section id="tab-developed-by" class="tab-section sr-only" style="display: none;" aria-labelledby="dev-heading">
+      
+      <div style="margin-bottom: var(--space-8);">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span>Academic Team & Guidance</span>
+        </div>
+        <h1 id="dev-heading" style="margin-bottom: var(--space-2);">
+          Developed By
+        </h1>
+        <p style="max-width: 720px; font-size: 1.1rem; color: var(--text-subhead);">
+          Academic Course Project — Database Management Systems (Digital Assignment Review).
+        </p>
+      </div>
+
+      <!-- Supervisor Guidance Card -->
+      <div class="card" style="background: var(--surface-code); border-color: var(--accent); margin-bottom: var(--space-8);">
+        <div style="display: flex; align-items: center; gap: var(--space-4);">
+          <div style="width: 56px; height: 56px; border-radius: var(--radius-card); background: var(--surface); border: 1px solid var(--accent); display: flex; align-items: center; justify-content: center; color: var(--accent); shrink-0;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          </div>
+          <div>
+            <span style="font-size: 11px; text-transform: uppercase; font-weight: bold; color: var(--accent); letter-spacing: 0.6px;">Faculty Supervisor</span>
+            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-top: 2px;">Guided By</div>
+            <h2 style="font-size: 1.4rem; color: var(--text-primary); margin-top: 2px;">Dr. Swaminathan A</h2>
+            <p style="font-size: 13px; color: var(--text-subhead); margin-bottom: 0;">
+              Assistant Professor • School of Computer Science and Engineering (SCOPE)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Team Grid -->
+      <h2 style="font-size: 1.25rem; margin-bottom: var(--space-4);">Student Project Contributors</h2>
+      <div class="grid-3">
+        
+        <div class="card" style="text-align: center;">
+          <div style="width: 72px; height: 72px; border-radius: var(--radius-pill); background: var(--surface-code); border: 2px solid var(--border); margin: 0 auto var(--space-3) auto; display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; font-size: 1.2rem;">
+            SL
+          </div>
+          <h3 style="font-size: 1.05rem;">Student Lead</h3>
+          <div style="font-family: var(--font-mono); font-size: 12px; color: var(--accent); margin: 4px 0;">Reg No: 21BCE1001</div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">Database Cost Modeling & Scoring Engine Logic</p>
+        </div>
+
+        <div class="card" style="text-align: center;">
+          <div style="width: 72px; height: 72px; border-radius: var(--radius-pill); background: var(--surface-code); border: 2px solid var(--border); margin: 0 auto var(--space-3) auto; display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; font-size: 1.2rem;">
+            TM
+          </div>
+          <h3 style="font-size: 1.05rem;">Team Member 2</h3>
+          <div style="font-family: var(--font-mono); font-size: 12px; color: var(--accent); margin: 4px 0;">Reg No: 21BCE1042</div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">UI/UX Architecture & Radar Visualization</p>
+        </div>
+
+        <div class="card" style="text-align: center;">
+          <div style="width: 72px; height: 72px; border-radius: var(--radius-pill); background: var(--surface-code); border: 2px solid var(--border); margin: 0 auto var(--space-3) auto; display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; font-size: 1.2rem;">
+            TM
+          </div>
+          <h3 style="font-size: 1.05rem;">Team Member 3</h3>
+          <div style="font-family: var(--font-mono); font-size: 12px; color: var(--accent); margin: 4px 0;">Reg No: 21BCE1095</div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">Validation Testing & Client-Side PDF Generation</p>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- TAB 4: HELP                                                       -->
+    <!-- ================================================================= -->
+    <section id="tab-help" class="tab-section sr-only" style="display: none;" aria-labelledby="help-heading">
+      
+      <div style="margin-bottom: var(--space-8);">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span>User Manual & Guide</span>
+        </div>
+        <h1 id="help-heading" style="margin-bottom: var(--space-2);">
+          Help & Operational Instructions
+        </h1>
+        <p style="max-width: 720px; font-size: 1.1rem; color: var(--text-subhead);">
+          Complete instructions on navigating the application, entering inputs, and interpreting trade-off scores.
+        </p>
+      </div>
+
+      <div class="card" style="margin-bottom: var(--space-6);">
+        <h2 style="font-size: 1.2rem; margin-bottom: var(--space-2);">What the Website Does</h2>
+        <p style="font-size: 14px; line-height: 1.6; color: var(--text-body);">
+          The <strong>Denormalization Trade-off Analyzer</strong> models the performance, storage, and consistency consequences of converting a normalized relational database (3NF) into a denormalized flat schema.
+        </p>
+        <p style="font-size: 14px; line-height: 1.6; color: var(--text-body);">
+          Users provide workload attributes—such as estimated row count, read/write ratio, query complexity, storage cost sensitivity, and consistency criticality. The application computes 0–10 scores across 5 dimensions, visualizes the trade-offs on a radar chart, and recommends whether to <strong>Prefer Normalization</strong>, <strong>Prefer Denormalization</strong>, or adopt a <strong>Hybrid</strong> architecture.
+        </p>
+      </div>
+
+      <div class="card" style="margin-bottom: var(--space-6);">
+        <h2 style="font-size: 1.2rem; margin-bottom: var(--space-4);">Step-by-Step Instructions</h2>
+        <div style="display: flex; flex-direction: column; gap: var(--space-4); font-size: 13px;">
+          <div>
+            <strong style="color: var(--text-primary); display: block;">1. How to navigate to the analyzer:</strong>
+            <p style="color: var(--text-muted); margin-bottom: 0;">Click the "Analyzer" tab in the top navigation bar at any time.</p>
+          </div>
+          <div>
+            <strong style="color: var(--text-primary); display: block;">2. How to fill each input field:</strong>
+            <p style="color: var(--text-muted); margin-bottom: 0;">
+              • <strong>Row count:</strong> Enter row count with optional shorthand (e.g., 50K, 2M, 50M) or click a preset chip.<br>
+              • <strong>Read / Write ratio:</strong> Drag the slider or enter percentages; values always sum to 100%.<br>
+              • <strong>Query complexity:</strong> Select Simple (1-2 joins), Medium (3-4 joins), or Complex (5+ joins).<br>
+              • <strong>Storage sensitivity:</strong> Select Low, Medium, or High depending on disk/RAM cost constraints.<br>
+              • <strong>Consistency criticality:</strong> Select Low (eventual consistency), Medium, or High (strict ACID).
+            </p>
+          </div>
+          <div>
+            <strong style="color: var(--text-primary); display: block;">3. What each button does:</strong>
+            <p style="color: var(--text-muted); margin-bottom: 0;">
+              • <strong>Calculate:</strong> Recomputes scores and renders recommendation banner and radar chart.<br>
+              • <strong>Reset:</strong> Restores baseline default parameters.<br>
+              • <strong>Load Scenario:</strong> Auto-fills the form with preset workload profiles (Small OLTP, Analytics Dashboard, Mixed).
+            </p>
+          </div>
+          <div>
+            <strong style="color: var(--text-primary); display: block;">4. How to interpret the scores and recommendation:</strong>
+            <p style="color: var(--text-muted); margin-bottom: 0;">
+              Scores range from 0 to 10 (higher is better). If the denormalization score substantially exceeds normalization on read-dominant workloads, the tool recommends "Prefer Denormalization". When write frequency or consistency requirements are high, it recommends "Prefer Normalization". Balanced workloads result in "Hybrid".
+            </p>
+          </div>
+          <div>
+            <strong style="color: var(--text-primary); display: block;">5. How to download a report:</strong>
+            <p style="color: var(--text-muted); margin-bottom: 0;">Click the "Download Report" button in the header or next to the results to export an executive PDF report, Word document, or plain text audit.</p>
+          </div>
+          <div>
+            <strong style="color: var(--text-primary); display: block;">6. How to toggle Day/Night mode:</strong>
+            <p style="color: var(--text-muted); margin-bottom: 0;">Click the sun/moon icon in the header. The setting is saved in your browser's local storage.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div class="card">
+        <h2 style="font-size: 1.2rem; margin-bottom: var(--space-4);">Frequently Asked Questions (FAQ)</h2>
+        <div style="display: flex; flex-direction: column; gap: var(--space-3); font-size: 13px;">
+          <div>
+            <strong style="color: var(--text-primary);">Q: What if my read/write ratio changes over time?</strong>
+            <p style="color: var(--text-muted); margin-bottom: 0;">You can use the live "What-If" slider to drag the ratio and immediately observe the tipping point where denormalization becomes beneficial.</p>
+          </div>
+          <div>
+            <strong style="color: var(--text-primary);">Q: Does denormalization always mean faster queries?</strong>
+            <p style="color: var(--text-muted); margin-bottom: 0;">Not always. If the table size exceeds available RAM, denormalized wide rows cause frequent database buffer cache evictions, causing random disk seek bottlenecks.</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- TAB 5: DEV / TEST PANEL                                           -->
+    <!-- ================================================================= -->
+    <section id="tab-tests" class="tab-section sr-only" style="display: none;" aria-labelledby="test-heading">
+      
+      <div style="margin-bottom: var(--space-8);">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span>Evaluation Test Runner</span>
+        </div>
+        <h1 id="test-heading" style="margin-bottom: var(--space-2);">
+          Automated Verification Test Suite
+        </h1>
+        <p style="max-width: 720px; font-size: 1.1rem; color: var(--text-subhead);">
+          Verifies PRD Section 10 test cases: T1 (Small OLTP), T2 (Analytics Dashboard), T3 (Mixed Workload), T4 (Ratio Sum validation), and T5 (Invalid row count rejection).
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 style="font-size: 1.15rem;">Automated Test Suite Runner</h2>
+            <span id="test-summary-banner" style="font-size: 12px; color: var(--accent);">Ready to run tests</span>
+          </div>
+          <button type="button" id="btn-run-tests" class="btn-accent-pill" style="padding: 6px 16px; min-height: 36px; font-size: 13px;">
+            Run All Tests
+          </button>
+        </div>
+
+        <div id="test-results-container" style="margin-top: var(--space-4);">
+          <p style="font-size: 13px; color: var(--text-muted);">Click "Run All Tests" above to execute test cases T1 through T5.</p>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Academic Footer -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container footer-content">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span class="brand-badge" style="width: 22px; height: 22px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        </span>
+        <span style="font-weight: 600; color: var(--text-primary);">Denormalization Trade-off Analyzer</span>
+        <span>— Academic Course Project (DA1)</span>
+      </div>
+
+      <div>
+        <span>Guided By: </span>
+        <strong style="color: var(--text-primary);">Dr. Swaminathan A</strong>
+        <span> (Assistant Professor, SCOPE)</span>
+      </div>
+
+      <div style="font-family: var(--font-mono); font-size: 11px;">
+        2026 • Client-Side DBMS Optimizer
+      </div>
+    </div>
+  </footer>
+
+  <!-- Report Download Modal -->
+  <div id="download-modal" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content">
+      <button type="button" id="close-download-modal" class="modal-close-btn" aria-label="Close dialog">&times;</button>
+      
+      <div class="eyebrow" style="margin-bottom: 4px;">
+        <span class="eyebrow-dot"></span>
+        <span>Client-Side Export</span>
+      </div>
+      <h2 id="modal-title" style="font-size: 1.3rem; margin-bottom: var(--space-2);">
+        Download Analysis Report
+      </h2>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: var(--space-5);">
+        Export your workload inputs, 0–10 dimension scores, radar chart, and key architectural takeaways.
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+        
+        <button type="button" id="dl-pdf" class="card" style="padding: var(--space-3); text-align: left; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-color: var(--accent);">
+          <div>
+            <strong style="font-size: 13px; color: var(--text-primary); display: block;">Executive PDF Report (Recommended)</strong>
+            <span style="font-size: 11px; color: var(--text-muted);">Formatted PDF with embedded radar chart and timestamp</span>
+          </div>
+          <span style="color: var(--accent); font-weight: bold; font-size: 13px;">↓ PDF</span>
+        </button>
+
+        <button type="button" id="dl-doc" class="card" style="padding: var(--space-3); text-align: left; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+          <div>
+            <strong style="font-size: 13px; color: var(--text-primary); display: block;">Microsoft Word Document (.doc)</strong>
+            <span style="font-size: 11px; color: var(--text-muted);">Editable rich document with structured score tables</span>
+          </div>
+          <span style="color: var(--text-primary); font-weight: bold; font-size: 13px;">↓ DOC</span>
+        </button>
+
+        <button type="button" id="dl-txt" class="card" style="padding: var(--space-3); text-align: left; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+          <div>
+            <strong style="font-size: 13px; color: var(--text-primary); display: block;">Plain Text Report (.txt)</strong>
+            <span style="font-size: 11px; color: var(--text-muted);">Fallback plain text audit with all inputs and justifications</span>
+          </div>
+          <span style="color: var(--text-primary); font-weight: bold; font-size: 13px;">↓ TXT</span>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Main JavaScript Module -->
+  <script type="module" src="js/main.js"></script>
+
+</body>
 </html>
