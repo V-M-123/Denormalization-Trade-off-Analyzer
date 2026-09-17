@@ -15,7 +15,9 @@ import { Radar, Bar } from 'react-chartjs-2';
 import { 
   Radar as RadarIcon, 
   BarChart2, 
-  Download
+  Download,
+  Pin,
+  Zap
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
@@ -231,16 +233,18 @@ export default function DimensionRadarChart({ evaluation, onOpenDownload }) {
         {/* Key Takeaways */}
         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
           <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800">
-            <strong className="text-slate-900 dark:text-white block mb-1">
-              📌 Why This Recommendation:
+            <strong className="text-slate-900 dark:text-white flex items-center gap-1.5 mb-1">
+              <Pin className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+              <span>Why This Recommendation:</span>
             </strong>
             <p className="text-slate-600 dark:text-slate-400">
               {recommendation.keyTakeaways.why}
             </p>
           </div>
           <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800">
-            <strong className="text-slate-900 dark:text-white block mb-1">
-              ⚡ What Could Trigger a Shift:
+            <strong className="text-slate-900 dark:text-white flex items-center gap-1.5 mb-1">
+              <Zap className="w-3.5 h-3.5 text-amber-500" />
+              <span>What Could Trigger a Shift:</span>
             </strong>
             <p className="text-slate-600 dark:text-slate-400">
               {recommendation.keyTakeaways.whatCouldChange}

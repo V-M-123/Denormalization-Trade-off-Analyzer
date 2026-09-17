@@ -8,7 +8,8 @@ import {
   Sliders, 
   Zap, 
   AlertTriangle, 
-  Download
+  Download,
+  Lightbulb
 } from 'lucide-react';
 
 export default function GuidedTourModal({ isOpen, onClose, onNavigateTab }) {
@@ -136,7 +137,9 @@ export default function GuidedTourModal({ isOpen, onClose, onNavigateTab }) {
 
             {/* Highlight Banner */}
             <div className="p-3.5 rounded-2xl glass-card border border-cyan-400/30 text-xs text-slate-700 dark:text-slate-200 mb-6 flex items-start space-x-2">
-              <span className="font-bold text-cyan-600 dark:text-cyan-400 shrink-0">💡 Note:</span>
+              <span className="font-bold text-cyan-600 dark:text-cyan-400 shrink-0 inline-flex items-center gap-1">
+                <Lightbulb className="w-3.5 h-3.5" /> Note:
+              </span>
               <p>{step.highlight}</p>
             </div>
 

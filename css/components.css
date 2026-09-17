@@ -185,11 +185,12 @@
 
 /* Code Window Card (with Traffic Light Dots) */
 .code-window {
-  background-color: var(--surface-code);
+  background-color: #141814;
   border: 1px solid var(--border);
   border-radius: var(--radius-code);
   overflow: hidden;
   margin-top: var(--space-4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .code-window-topbar {
@@ -197,8 +198,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 16px;
-  background-color: rgba(0, 0, 0, 0.4);
-  border-bottom: 1px solid var(--border);
+  background-color: #0d110d;
+  border-bottom: 1px solid rgba(140, 171, 135, 0.2);
 }
 
 .traffic-dots {
@@ -220,7 +221,7 @@
 .code-window-title {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--text-eyebrow);
+  color: #9cbf93;
 }
 
 .code-window-content {
@@ -228,13 +229,13 @@
   font-family: var(--font-mono);
   font-size: 12px;
   line-height: 1.6;
-  color: var(--text-primary);
+  color: #ddffdc;
   overflow-x: auto;
 }
 
-.code-keyword { color: var(--accent); font-weight: 600; }
-.code-string { color: var(--color-moss-80); }
-.code-comment { color: var(--color-sage-40); font-style: italic; }
+.code-window .code-keyword { color: #7fee64; font-weight: 600; }
+.code-window .code-string { color: #aed2a4; }
+.code-window .code-comment { color: #8cab87; font-style: italic; }
 
 /* Form Elements */
 .form-group {
@@ -404,20 +405,38 @@
 
 .verdict-tag.denorm {
   background: rgba(127, 238, 100, 0.15);
-  color: var(--accent);
-  border: 1px solid var(--accent);
+  color: var(--indicator-denorm);
+  border: 1px solid var(--indicator-denorm);
 }
 
 .verdict-tag.norm {
   background: rgba(96, 165, 250, 0.15);
-  color: #93c5fd;
-  border: 1px solid #60a5fa;
+  color: var(--indicator-norm);
+  border: 1px solid var(--indicator-norm);
 }
 
 .verdict-tag.hybrid {
   background: rgba(192, 132, 252, 0.15);
-  color: #d8b4fe;
-  border: 1px solid #c084fc;
+  color: var(--indicator-hybrid);
+  border: 1px solid var(--indicator-hybrid);
+}
+
+[data-theme="day"] .verdict-tag.denorm {
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+  border-color: #16a34a;
+}
+
+[data-theme="day"] .verdict-tag.norm {
+  background: rgba(37, 99, 235, 0.10);
+  color: #1d4ed8;
+  border-color: #2563eb;
+}
+
+[data-theme="day"] .verdict-tag.hybrid {
+  background: rgba(124, 58, 237, 0.10);
+  color: #6d28d9;
+  border-color: #7c3aed;
 }
 
 /* Dimension Score Cards - Single row across full width */
@@ -557,3 +576,119 @@
     flex-direction: row;
   }
 }
+
+/* ========================================================================== */
+/* 21st.dev & ReactBits Transitions, Spotlight, and Interactive Physics       */
+/* ========================================================================== */
+
+/* 1. ReactBits Spotlight Card Effect */
+.card, .dim-card, .recommendation-banner {
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before, .dim-card::before, .recommendation-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    550px circle at var(--mouse-x, -500px) var(--mouse-y, -500px),
+    rgba(127, 238, 100, 0.07),
+    transparent 65%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+[data-theme="day"] .card::before,
+[data-theme="day"] .dim-card::before,
+[data-theme="day"] .recommendation-banner::before {
+  background: radial-gradient(
+    550px circle at var(--mouse-x, -500px) var(--mouse-y, -500px),
+    rgba(37, 99, 235, 0.06),
+    transparent 65%
+  );
+}
+
+.card:hover::before, .dim-card:hover::before, .recommendation-banner:hover::before {
+  opacity: 1;
+}
+
+/* Ensure inner interactive elements remain clickable above spotlight */
+.card > *, .dim-card > *, .recommendation-banner > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* 2. 21st.dev Shiny Button Shimmer */
+.btn-accent-pill {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-accent-pill::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.28) 50%,
+    transparent 65%
+  );
+  transform: rotate(30deg) translateX(-100%);
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.btn-accent-pill:hover::after {
+  transform: rotate(30deg) translateX(100%);
+}
+
+/* 3. 21st.dev Sliding Pill Nav Indicator */
+.nav-links {
+  position: relative;
+}
+
+.nav-sliding-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-button);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 0;
+  will-change: transform, width, opacity;
+}
+
+.nav-link {
+  position: relative;
+  z-index: 1;
+}
+
+.nav-link.active {
+  color: var(--accent);
+}
+
+/* 4. Spinner Keyframe for Smooth Loading Transitions */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+

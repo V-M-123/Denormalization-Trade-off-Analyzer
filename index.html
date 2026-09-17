@@ -56,6 +56,7 @@
         <button type="button" class="nav-link" data-nav-target="tab-developed-by" aria-selected="false">Developed By</button>
         <button type="button" class="nav-link" data-nav-target="tab-help" aria-selected="false">Help</button>
         <button type="button" class="nav-link" data-nav-target="tab-tests" aria-selected="false">Dev/Test Panel</button>
+        <button type="button" class="nav-link" data-nav-target="tab-submit-schema" aria-selected="false">Submit Your Schema</button>
       </nav>
 
       <!-- Actions: Download & Theme Toggle -->
@@ -239,16 +240,18 @@
 
             <div style="margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--border-subtle); display: grid; grid-template-columns: 1fr; gap: var(--space-3);">
               <div>
-                <strong style="font-size: 11px; text-transform: uppercase; color: var(--text-eyebrow); display: block; margin-bottom: 2px;">
-                  📌 Key Takeaway: Why this recommendation was made
+                <strong style="font-size: 11px; text-transform: uppercase; color: var(--text-eyebrow); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  Key Takeaway: Why this recommendation was made
                 </strong>
                 <p id="takeaway-why" style="font-size: 12px; color: var(--text-body); margin-bottom: 0;">
                   <!-- Populated by js/scoring.js -->
                 </p>
               </div>
               <div>
-                <strong style="font-size: 11px; text-transform: uppercase; color: var(--text-eyebrow); display: block; margin-bottom: 2px;">
-                  ⚡ What could change the recommendation
+                <strong style="font-size: 11px; text-transform: uppercase; color: var(--text-eyebrow); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  What could change the recommendation
                 </strong>
                 <p id="takeaway-flip" style="font-size: 12px; color: var(--text-body); margin-bottom: 0;">
                   <!-- Populated by js/scoring.js -->
@@ -277,6 +280,7 @@
         </div>
 
       </div>
+
 
       <!-- 5-Dimension Analytics Score Cards (Single Row across full width) -->
       <div style="margin-top: var(--space-8);">
@@ -409,15 +413,15 @@
           </p>
 
           <div class="grid-3" style="margin: var(--space-4) 0;">
-            <div style="padding: var(--space-3); border-radius: var(--radius-card); background: var(--surface-code); border: 1px solid var(--border);">
+            <div style="padding: var(--space-3); border-radius: var(--radius-card); background: var(--surface-elevated); border: 1px solid var(--border);">
               <strong style="color: var(--accent); font-size: 13px; display: block; margin-bottom: 4px;">1NF (First Normal Form)</strong>
               <p style="font-size: 12px; margin-bottom: 0;">Eliminates duplicate columns and repeating groups; ensures every column contains atomic (indivisible) values and each record has a unique primary key.</p>
             </div>
-            <div style="padding: var(--space-3); border-radius: var(--radius-card); background: var(--surface-code); border: 1px solid var(--border);">
+            <div style="padding: var(--space-3); border-radius: var(--radius-card); background: var(--surface-elevated); border: 1px solid var(--border);">
               <strong style="color: var(--accent); font-size: 13px; display: block; margin-bottom: 4px;">2NF (Second Normal Form)</strong>
               <p style="font-size: 12px; margin-bottom: 0;">Satisfies 1NF and removes partial dependencies: all non-key attributes must depend on the entire primary key, not just a portion of a composite key.</p>
             </div>
-            <div style="padding: var(--space-3); border-radius: var(--radius-card); background: var(--surface-code); border: 1px solid var(--border);">
+            <div style="padding: var(--space-3); border-radius: var(--radius-card); background: var(--surface-elevated); border: 1px solid var(--border);">
               <strong style="color: var(--accent); font-size: 13px; display: block; margin-bottom: 4px;">3NF (Third Normal Form)</strong>
               <p style="font-size: 12px; margin-bottom: 0;">Satisfies 2NF and removes transitive dependencies: non-key attributes must not depend on other non-key attributes ("every non-key depends strictly on the key").</p>
             </div>
@@ -525,7 +529,7 @@
       </div>
 
       <!-- Supervisor Guidance Card -->
-      <div class="card" style="background: var(--surface-code); border-color: var(--accent); margin-bottom: var(--space-8);">
+      <div class="card" style="background: var(--surface-elevated); border-color: var(--accent); margin-bottom: var(--space-8);">
         <div style="display: flex; align-items: center; gap: var(--space-4);">
           <div style="width: 56px; height: 56px; border-radius: var(--radius-card); background: var(--surface); border: 1px solid var(--accent); display: flex; align-items: center; justify-content: center; color: var(--accent); shrink-0;">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
@@ -546,7 +550,7 @@
       <div class="grid-3">
         
         <div class="card" style="text-align: center;">
-          <div style="width: 72px; height: 72px; border-radius: var(--radius-pill); background: var(--surface-code); border: 2px solid var(--border); margin: 0 auto var(--space-3) auto; display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; font-size: 1.2rem;">
+          <div style="width: 72px; height: 72px; border-radius: var(--radius-pill); background: var(--surface-elevated); border: 2px solid var(--border); margin: 0 auto var(--space-3) auto; display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; font-size: 1.2rem;">
             SL
           </div>
           <h3 style="font-size: 1.05rem;">Student Lead</h3>
@@ -555,7 +559,7 @@
         </div>
 
         <div class="card" style="text-align: center;">
-          <div style="width: 72px; height: 72px; border-radius: var(--radius-pill); background: var(--surface-code); border: 2px solid var(--border); margin: 0 auto var(--space-3) auto; display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; font-size: 1.2rem;">
+          <div style="width: 72px; height: 72px; border-radius: var(--radius-pill); background: var(--surface-elevated); border: 2px solid var(--border); margin: 0 auto var(--space-3) auto; display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; font-size: 1.2rem;">
             TM
           </div>
           <h3 style="font-size: 1.05rem;">Team Member 2</h3>
@@ -564,7 +568,7 @@
         </div>
 
         <div class="card" style="text-align: center;">
-          <div style="width: 72px; height: 72px; border-radius: var(--radius-pill); background: var(--surface-code); border: 2px solid var(--border); margin: 0 auto var(--space-3) auto; display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; font-size: 1.2rem;">
+          <div style="width: 72px; height: 72px; border-radius: var(--radius-pill); background: var(--surface-elevated); border: 2px solid var(--border); margin: 0 auto var(--space-3) auto; display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; font-size: 1.2rem;">
             TM
           </div>
           <h3 style="font-size: 1.05rem;">Team Member 3</h3>
@@ -681,20 +685,224 @@
         </p>
       </div>
 
-      <div class="card">
-        <div class="card-header">
+      <!-- Suite Overview & Summary Statistics -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+        <div style="padding: var(--space-4); border-radius: var(--radius-card); background: var(--surface-code); border: 1px solid var(--border);">
+          <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-family: var(--font-mono); font-weight: 600;">Total Test Cases</span>
+          <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent); font-family: var(--font-mono); margin-top: 4px;">5 / 5</div>
+          <p style="font-size: 11px; color: var(--text-body); margin-bottom: 0;">T1 through T5 PRD matrix</p>
+        </div>
+        <div style="padding: var(--space-4); border-radius: var(--radius-card); background: var(--surface-code); border: 1px solid var(--border);">
+          <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-family: var(--font-mono); font-weight: 600;">Verification Scope</span>
+          <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-mono); margin-top: 4px;">End-to-End</div>
+          <p style="font-size: 11px; color: var(--text-body); margin-bottom: 0;">Math models + Form guards</p>
+        </div>
+        <div style="padding: var(--space-4); border-radius: var(--radius-card); background: var(--surface-code); border: 1px solid var(--border);">
+          <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-family: var(--font-mono); font-weight: 600;">Execution Engine</span>
+          <div style="font-size: 1.5rem; font-weight: 700; color: #38bdf8; font-family: var(--font-mono); margin-top: 4px;">In-Browser</div>
+          <p style="font-size: 11px; color: var(--text-body); margin-bottom: 0;">Deterministic, real-time</p>
+        </div>
+        <div style="padding: var(--space-4); border-radius: var(--radius-card); background: var(--surface-code); border: 1px solid var(--border);">
+          <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-family: var(--font-mono); font-weight: 600;">Suite Pass Rate</span>
+          <div id="stat-pass-rate" style="font-size: 1.5rem; font-weight: 700; color: var(--accent); font-family: var(--font-mono); margin-top: 4px;">100%</div>
+          <p style="font-size: 11px; color: var(--text-body); margin-bottom: 0;">All assertions verified</p>
+        </div>
+      </div>
+
+      <!-- Test Suite Summary & Theoretical Rationale Callout -->
+      <div class="card" style="margin-bottom: var(--space-6); background: var(--surface-code); border: 1px solid var(--border);">
+        <div class="card-header" style="margin-bottom: var(--space-2);">
           <div>
-            <h2 style="font-size: 1.15rem;">Automated Test Suite Runner</h2>
-            <span id="test-summary-banner" style="font-size: 12px; color: var(--accent);">Ready to run tests</span>
+            <h2 style="font-size: 1.15rem; margin-bottom: 2px; display: inline-flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+              Test Suite Summary &amp; Theoretical Framework
+            </h2>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">How automated tests validate relational database theory and scoring accuracy.</p>
           </div>
-          <button type="button" id="btn-run-tests" class="btn-accent-pill" style="padding: 6px 16px; min-height: 36px; font-size: 13px;">
-            Run All Tests
-          </button>
+        </div>
+        <p style="font-size: 13px; color: var(--text-body); line-height: 1.6; margin-bottom: var(--space-4);">
+          This automated suite validates that the decision engine rigorously models relational database trade-offs in accordance with formal DBMS normalization theory (1NF–3NF) versus physical denormalization patterns. Each test verifies a distinct architectural archetype and guarantees resilience against invalid inputs.
+        </p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-3); font-size: 12px;">
+          <div style="padding: var(--space-3); background: rgba(0,0,0,0.18); border-radius: var(--radius-card); border-left: 3px solid var(--accent);">
+            <strong style="color: var(--text-primary); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Read vs. Write Latency
+            </strong>
+            <p style="margin: 0; color: var(--text-muted);">Tests T1 &amp; T2 prove that read-heavy workloads favor denormalization to bypass multi-table joins, while write-heavy workloads penalize denormalization due to write amplification and multi-row locking contention.</p>
+          </div>
+          <div style="padding: var(--space-3); background: rgba(0,0,0,0.18); border-radius: var(--radius-card); border-left: 3px solid #f59e0b;">
+            <strong style="color: var(--text-primary); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
+              Consistency &amp; Hybrid Boundaries
+            </strong>
+            <p style="margin: 0; color: var(--text-muted);">Test T3 verifies that balanced access profiles avoid premature optimization by triggering contextual hybrid recommendations rather than false binary absolutes.</p>
+          </div>
+          <div style="padding: var(--space-3); background: rgba(0,0,0,0.18); border-radius: var(--radius-card); border-left: 3px solid #ef4444;">
+            <strong style="color: var(--text-primary); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Defensive Input Sanitization
+            </strong>
+            <p style="margin: 0; color: var(--text-muted);">Tests T4 &amp; T5 verify mathematical integrity: enforcing a closed 100% read/write probability distribution and strictly rejecting malformed or negative scale inputs.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Test Cases Runner Card -->
+      <div class="card">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-3);">
+          <div>
+            <h2 style="font-size: 1.15rem; margin-bottom: 2px;">Automated Verification Runner</h2>
+            <span id="test-summary-banner" style="font-size: 12px; color: var(--accent); font-weight: 500;">Ready to execute test matrix</span>
+          </div>
+          <div style="display: flex; gap: var(--space-2); align-items: center;">
+            <button type="button" id="btn-run-tests" class="btn-accent-pill" style="padding: 6px 18px; min-height: 36px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span>Run All Tests</span>
+            </button>
+          </div>
         </div>
 
         <div id="test-results-container" style="margin-top: var(--space-4);">
-          <p style="font-size: 13px; color: var(--text-muted);">Click "Run All Tests" above to execute test cases T1 through T5.</p>
+          <!-- Populated by js/main.js on load and on click -->
         </div>
+      </div>
+
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- TAB 6: SUBMIT YOUR SCHEMA (Dedicated Workspace)                   -->
+    <!-- ================================================================= -->
+    <section id="tab-submit-schema" class="tab-section sr-only" style="display: none;" aria-labelledby="submit-schema-heading">
+      
+      <div style="margin-bottom: var(--space-8);">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span>Physical Schema Evaluator</span>
+        </div>
+        <h1 id="submit-schema-heading" style="margin-bottom: var(--space-2);">
+          Submit Your Own Database Schema
+        </h1>
+        <p style="max-width: 760px; font-size: 1.1rem; color: var(--text-subhead);">
+          Upload your relational DDL or paste SQL statements directly. The AST engine analyzes foreign keys, join depths, and attribute duplication, evaluating normalization vs. denormalization against your workload.
+        </p>
+      </div>
+
+      <div class="grid-2" style="align-items: start;">
+        
+        <!-- Left: Upload & DDL Input Card -->
+        <div class="card">
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <h2 style="font-size: 1.15rem;">Schema &amp; Workload Spec</h2>
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">Upload .sql, .csv, or .json file (Max 500MB) or enter definitions.</p>
+            </div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <button type="button" id="btn-tab-load-sample" class="btn-ghost-outline" style="padding: 4px 8px; font-size: 11px; min-height: 28px;">
+                Sample DDL
+              </button>
+              <button type="button" id="btn-tab-load-sample-csv" class="btn-ghost-outline" style="padding: 4px 8px; font-size: 11px; min-height: 28px;">
+                Sample CSV
+              </button>
+              <button type="button" id="btn-tab-load-sample-json" class="btn-ghost-outline" style="padding: 4px 8px; font-size: 11px; min-height: 28px;">
+                Sample JSON
+              </button>
+            </div>
+          </div>
+
+          <!-- Drag and Drop Dropzone -->
+          <div id="tab-schema-drop-zone" style="border: 2px dashed var(--border); border-radius: var(--radius-card); padding: var(--space-5); text-align: center; cursor: pointer; transition: border-color var(--transition-fast); margin-bottom: var(--space-4); background: var(--surface-elevated);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto var(--space-2); color: var(--accent);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p style="font-size: 13px; margin-bottom: 2px; color: var(--text-primary); font-weight: 600;">Drag &amp; drop your SQL, CSV, or JSON file here, or click to browse</p>
+            <span style="font-size: 11px; color: var(--text-muted);">Supports SQL DDL, CSV datasets, and JSON schemas (Max 500MB)</span>
+            <input type="file" id="tab-input-schema-file" accept=".sql,.ddl,.csv,.json,.ndjson,.txt" style="display: none;">
+          </div>
+
+          <!-- DDL Textarea -->
+          <div class="form-group">
+            <label for="tab-input-schema-sql" class="form-label">SQL DDL Definition:</label>
+            <textarea id="tab-input-schema-sql" class="form-input" rows="8" style="font-family: var(--font-mono); font-size: 12px; resize: vertical;" placeholder="CREATE TABLE Customers (customer_id INT PRIMARY KEY, ...);&#10;CREATE TABLE Orders (order_id INT PRIMARY KEY, customer_id INT REFERENCES Customers(customer_id), ...);"></textarea>
+          </div>
+
+          <!-- Workload Quick Parameters -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-bottom: var(--space-4);">
+            <div>
+              <label for="tab-input-row-count" style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 2px;">Estimated Rows</label>
+              <input type="text" id="tab-input-row-count" class="form-input" value="10M">
+            </div>
+            <div>
+              <label for="tab-input-dialect" style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 2px;">SQL Dialect</label>
+              <select id="tab-input-dialect" class="form-input" style="height: 36px; padding: 4px 8px; font-size: 12px;">
+                <option value="generic">Generic SQL</option>
+                <option value="postgres">PostgreSQL</option>
+                <option value="mysql">MySQL</option>
+                <option value="sqlite">SQLite</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: var(--space-3); border-top: 1px solid var(--border-subtle);">
+            <span id="tab-schema-status" style="font-size: 11px; color: var(--text-muted);">Ready to analyze</span>
+            <button type="button" id="tab-btn-analyze" class="btn-accent-pill" style="padding: 8px 20px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span>Analyze Schema &amp; Workload</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Real-time Analysis & Diagnostics Display -->
+        <div class="card" id="tab-analysis-results-card">
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h2 style="font-size: 1.15rem;">Schema AST Diagnostics</h2>
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">Topological findings and denormalization suggestions.</p>
+            </div>
+            <span id="tab-diag-badge" class="verdict-tag" style="background: rgba(127, 238, 100, 0.15); color: var(--accent); border: 1px solid var(--accent);">
+              Awaiting Schema
+            </span>
+          </div>
+
+          <div class="grid-3" style="margin: var(--space-3) 0;">
+            <div style="padding: var(--space-3); border-radius: var(--radius-card); background: var(--surface-elevated); border: 1px solid var(--border);">
+              <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-family: var(--font-mono);">Tables / FKs</span>
+              <div id="tab-diag-tables" style="font-size: 1.25rem; font-weight: 700; color: var(--accent); font-family: var(--font-mono); margin-top: 2px;">0 / 0</div>
+            </div>
+            <div style="padding: var(--space-3); border-radius: var(--radius-card); background: var(--surface-elevated); border: 1px solid var(--border);">
+              <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-family: var(--font-mono);">Max Join Depth</span>
+              <div id="tab-diag-depth" style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-mono); margin-top: 2px;">0 Hops</div>
+            </div>
+            <div style="padding: var(--space-3); border-radius: var(--radius-card); background: var(--surface-elevated); border: 1px solid var(--border);">
+              <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-family: var(--font-mono);">Redundancies</span>
+              <div id="tab-diag-redundancies" style="font-size: 1.25rem; font-weight: 700; color: #f59e0b; font-family: var(--font-mono); margin-top: 2px;">0</div>
+            </div>
+          </div>
+
+          <div style="margin-top: var(--space-4);">
+            <strong style="font-size: 12px; color: #f59e0b; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Redundancy &amp; Update Hazards:
+            </strong>
+            <ul id="tab-diag-redundancy-list" style="font-size: 12px; line-height: 1.5; padding-left: 18px; margin-bottom: var(--space-3); color: var(--text-body);">
+              <li>Upload a schema or load the sample DDL to view redundancy insights.</li>
+            </ul>
+
+            <strong style="font-size: 12px; color: var(--accent); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Denormalization Opportunities:
+            </strong>
+            <ul id="tab-diag-opportunity-list" style="font-size: 12px; line-height: 1.5; padding-left: 18px; margin-bottom: var(--space-4); color: var(--text-body);">
+              <li>Upload a schema to discover pre-join candidate attributes.</li>
+            </ul>
+
+            <div style="display: flex; justify-content: flex-end;">
+              <button type="button" id="btn-view-in-analyzer" class="btn-accent-pill" style="padding: 6px 14px; font-size: 12px; display: none;">
+                View in Full Analyzer Radar Chart &rarr;
+              </button>
+            </div>
+          </div>
+
+        </div>
+
       </div>
 
     </section>

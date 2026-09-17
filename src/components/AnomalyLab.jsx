@@ -180,7 +180,11 @@ export default function AnomalyLab() {
                   ? 'bg-rose-600 text-white shadow-md shadow-rose-500/30 animate-pulse'
                   : 'glass-pill text-slate-600 dark:text-slate-400'
               }`}>
-                {anomalyTriggered ? '⚠️ CORRUPTED / DIVERGENT' : 'In Sync'}
+                {anomalyTriggered ? (
+                  <span className="inline-flex items-center gap-1">
+                    <ShieldAlert className="w-3 h-3 text-white" /> CORRUPTED / DIVERGENT
+                  </span>
+                ) : 'In Sync'}
               </span>
             </div>
 

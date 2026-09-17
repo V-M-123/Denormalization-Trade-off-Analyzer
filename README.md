@@ -125,7 +125,33 @@ The application includes an automated test harness in the **Dev/Test Panel** ver
 
 ---
 
-## 7. Security & Standards Compliance
+## 7. Custom Schema Upload & Backend Analysis Engine
+
+The application includes an automated **Schema AST Parser & Graph Analysis Backend** that allows users to upload their own physical DDL schemas (`.sql`, `.ddl`, or raw SQL text) and analyze them against their custom workload characteristics.
+
+### Running the Backend Engine
+```bash
+# Start the backend server on http://localhost:4000
+npm run server
+
+# Or run in watch mode for development
+npm run server:dev
+
+# Run automated backend unit tests
+npx tsx server/test/testEngine.ts
+```
+
+### Backend Capabilities & Endpoints
+- **AST Parsing (`node-sql-parser` with regex fallback):** Extracts tables, columns, primary keys, and foreign keys across PostgreSQL, MySQL, SQLite, and Generic SQL.
+- **Topological Analysis:** Calculates maximum join depth across foreign key paths, detects redundant/duplicated attributes across tables, and estimates the current Normal Form (1NF, 2NF, 3NF, or Denormalized).
+- **Endpoint `POST /api/v1/schema/analyze`:**
+  - Accepts `multipart/form-data` (file upload) or `application/json` (raw SQL text + workload parameters).
+  - Returns AST summary (table count, foreign keys, max join depth), redundancy diagnostics, candidate denormalization proposals, and custom 5-dimension trade-off scores.
+
+---
+
+## 8. Security & Standards Compliance
 - **Content Security Policy (CSP):** Scoped `<meta>` tag restricting script and style sources to trusted origins.
 - **XSS Prevention:** All user-entered text is sanitized through text nodes (`textContent`), never interpolated via raw `innerHTML`.
+- **Safe DDL Evaluation:** Pure AST parsing and static topological analysis; no SQL query is ever executed against a database engine.
 - **Privacy-Enhanced Video:** YouTube tutorial embedded via `youtube-nocookie.com`.

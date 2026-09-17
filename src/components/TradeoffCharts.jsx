@@ -14,7 +14,7 @@ import {
 import { Line, Bar } from 'react-chartjs-2';
 import { generateWorkloadSweepData } from '../engine/costModel';
 import { useTheme } from '../context/ThemeContext';
-import { TrendingUp, PieChart, Layers } from 'lucide-react';
+import { TrendingUp, PieChart, Layers, Lightbulb } from 'lucide-react';
 
 ChartJS.register(
   CategoryScale,
@@ -254,8 +254,9 @@ export default function TradeoffCharts({ metrics }) {
         </div>
 
         <div className="mt-4 text-xs text-slate-600 dark:text-slate-300 glass-card p-3 rounded-xl flex items-center justify-between">
-          <span>
-            💡 <strong>Observation:</strong> At workloads below <strong>{metrics.latency.breakEvenPercent}% Reads</strong>, Normalized 3NF wins due to low write amplification. Above <strong>{metrics.latency.breakEvenPercent}% Reads</strong>, Denormalization wins by eliminating join overhead.
+          <span className="flex items-center gap-1.5">
+            <Lightbulb className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400 shrink-0" />
+            <span><strong>Observation:</strong> At workloads below <strong>{metrics.latency.breakEvenPercent}% Reads</strong>, Normalized 3NF wins due to low write amplification. Above <strong>{metrics.latency.breakEvenPercent}% Reads</strong>, Denormalization wins by eliminating join overhead.</span>
           </span>
           <span className="hidden md:inline font-mono text-[11px] text-cyan-600 dark:text-cyan-400 ml-2 whitespace-nowrap">
             Current: {metrics.latency.readRatioPercent}% R / {metrics.latency.writeRatioPercent}% W

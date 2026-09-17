@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, ExternalLink } from 'lucide-react';
+import { BookOpen, ExternalLink, Globe, BookMarked, FileText } from 'lucide-react';
 
 export default function LearnSection() {
   return (
@@ -231,8 +231,9 @@ CREATE TABLE Orders_Denormalized (
           
           {/* Online DB Resources */}
           <div>
-            <h4 className="font-bold text-slate-900 dark:text-white mb-2 uppercase text-[11px] tracking-wider text-cyan-700 dark:text-cyan-400">
-              🌐 Online Database Documentation & Guides
+            <h4 className="font-bold text-slate-900 dark:text-white mb-2 uppercase text-[11px] tracking-wider text-cyan-700 dark:text-cyan-400 flex items-center gap-1.5">
+              <Globe className="w-3.5 h-3.5" />
+              <span>Online Database Documentation &amp; Guides</span>
             </h4>
             <ul className="space-y-2 list-disc pl-5 text-slate-700 dark:text-slate-300">
               <li>
@@ -254,7 +255,7 @@ CREATE TABLE Orders_Denormalized (
                   rel="noreferrer"
                   className="font-semibold text-cyan-600 dark:text-cyan-400 hover:underline inline-flex items-center space-x-1"
                 >
-                  <span>Exasol: Database Design & Normalization Trade-offs</span>
+                  <span>Exasol: Database Design &amp; Normalization Trade-offs</span>
                   <ExternalLink className="w-3 h-3 ml-0.5" />
                 </a>
                 <p className="text-[11px] text-slate-500">In-depth guide on analytical data architectures, in-memory caching, and wide-table optimizations.</p>
@@ -276,8 +277,9 @@ CREATE TABLE Orders_Denormalized (
 
           {/* Authoritative Textbooks */}
           <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-            <h4 className="font-bold text-slate-900 dark:text-white mb-2 uppercase text-[11px] tracking-wider text-indigo-700 dark:text-indigo-400">
-              📚 Authoritative Textbooks
+            <h4 className="font-bold text-slate-900 dark:text-white mb-2 uppercase text-[11px] tracking-wider text-indigo-700 dark:text-indigo-400 flex items-center gap-1.5">
+              <BookMarked className="w-3.5 h-3.5" />
+              <span>Authoritative Textbooks</span>
             </h4>
             <ul className="space-y-2 list-disc pl-5 text-slate-700 dark:text-slate-300">
               <li>
@@ -291,8 +293,9 @@ CREATE TABLE Orders_Denormalized (
 
           {/* Research & Video Citation */}
           <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-            <h4 className="font-bold text-slate-900 dark:text-white mb-2 uppercase text-[11px] tracking-wider text-emerald-700 dark:text-emerald-400">
-              🔬 Research Papers & Video Citation
+            <h4 className="font-bold text-slate-900 dark:text-white mb-2 uppercase text-[11px] tracking-wider text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5" />
+              <span>Research Papers &amp; Video Citation</span>
             </h4>
             <ul className="space-y-2 list-disc pl-5 text-slate-700 dark:text-slate-300">
               <li>
