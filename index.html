@@ -470,7 +470,7 @@
           </p>
 
           <h3 style="font-size: 1rem; color: var(--text-primary); margin-top: var(--space-6); margin-bottom: var(--space-2);">The Five Core Trade-offs</h3>
-          <ul style="list-style-type: disc; padding-left: 20px; font-size: 13px; space-y: 8px;">
+          <ul style="list-style-type: disc; padding-left: 20px; font-size: 13px; line-height: 1.6; display: grid; gap: 8px;">
             <li><strong>Read Performance:</strong> Denormalization accelerates reads by eliminating table joins; however, if datasets exceed available RAM, wider rows diminish buffer pool efficiency.</li>
             <li><strong>Write Performance:</strong> Normalization provides ultra-fast single-row updates. Denormalization causes severe write amplification because updating one entity requires updating redundant copies across multiple rows.</li>
             <li><strong>Storage Efficiency:</strong> Normalized schemas occupy minimal disk space. Denormalization duplicates string columns and bloats secondary B-tree indexes.</li>

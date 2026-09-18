@@ -714,3 +714,32 @@ body.cursor-mode-trail * {
   animation: spin 1s linear infinite;
 }
 
+/* 5. Smooth Tab Dissolve Transitions (0.75s Duration) - Pixel-Crisp (No Transforms) */
+@keyframes tabDissolveOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes tabDissolveIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.tab-section.tab-fade-out {
+  animation: tabDissolveOut 0.75s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+  pointer-events: none !important;
+}
+
+.tab-section.tab-fade-in {
+  animation: tabDissolveIn 0.75s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
+

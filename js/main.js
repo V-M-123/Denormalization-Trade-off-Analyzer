@@ -179,7 +179,12 @@ function setupNavigation() {
     }, { duration: 0.25, ease: [0.16, 1, 0.3, 1] });
   }
 
+  let activeTabId = 'tab-analyzer';
+  let tabSwitchTimeout = null;
+
   function switchTab(targetId) {
+    if (!targetId || targetId === activeTabId) return;
+
     let targetBtn = null;
     navButtons.forEach(btn => {
       if (btn.getAttribute('data-nav-target') === targetId) {
@@ -196,29 +201,61 @@ function setupNavigation() {
       updateSlidingPill(targetBtn);
     }
 
-    tabSections.forEach(section => {
-      if (section.id === targetId) {
-        section.classList.remove('sr-only');
-        section.style.display = 'block';
-        // 21st.dev / ReactBits Motion Transition
-        animate(section, { opacity: [0, 1], y: [12, 0] }, { duration: 0.28, ease: [0.16, 1, 0.3, 1] });
-      } else {
-        section.classList.add('sr-only');
-        section.style.display = 'none';
-      }
-    });
+    const currentSection = document.getElementById(activeTabId);
+    activeTabId = targetId;
 
-    // If switching to analyzer, ensure full analysis results and chart render cleanly
-    if (targetId === 'tab-analyzer' && currentEvaluation) {
-      renderResults(currentEvaluation);
-      setTimeout(() => {
-        const isDay = document.documentElement.getAttribute('data-theme') === 'day';
-        const canvas = document.getElementById('tradeoff-chart');
-        if (canvas && currentEvaluation.breakdown) {
-          renderTradeoffChart(canvas, currentEvaluation.breakdown, isDay, currentChartType);
-        }
-      }, 50);
+    if (tabSwitchTimeout) {
+      clearTimeout(tabSwitchTimeout);
     }
+
+    // 1. Dissolve out current active section over 0.75s
+    if (currentSection && currentSection.style.display !== 'none') {
+      currentSection.classList.remove('tab-fade-in');
+      void currentSection.offsetWidth;
+      currentSection.classList.add('tab-fade-out');
+    }
+
+    // 2. Open and dissolve in target section after 0.75s (750ms) delay
+    tabSwitchTimeout = setTimeout(() => {
+      tabSections.forEach(section => {
+        if (section.id === targetId) {
+          section.classList.remove('sr-only', 'tab-fade-out');
+          section.style.display = 'block';
+          // Force layout reflow so the CSS animation always replays
+          void section.offsetWidth;
+          section.classList.add('tab-fade-in');
+        } else {
+          section.classList.add('sr-only');
+          section.classList.remove('tab-fade-in', 'tab-fade-out');
+          section.style.display = 'none';
+        }
+      });
+
+      // If user was scrolled down, reset scroll to top for fresh tab
+      if (window.scrollY > 120) {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }
+
+      // If switching to analyzer, ensure full analysis results and chart render cleanly
+      if (targetId === 'tab-analyzer' && currentEvaluation) {
+        renderResults(currentEvaluation);
+        setTimeout(() => {
+          const isDay = document.documentElement.getAttribute('data-theme') === 'day';
+          const canvas = document.getElementById('tradeoff-chart');
+          if (canvas && currentEvaluation.breakdown) {
+            renderTradeoffChart(canvas, currentEvaluation.breakdown, isDay, currentChartType);
+          }
+        }, 50);
+      }
+
+      // Clean up fade-in animation state so text returns to 100% native vector rendering
+      setTimeout(() => {
+        const targetEl = document.getElementById(targetId);
+        if (targetEl && targetEl.id === activeTabId) {
+          targetEl.classList.remove('tab-fade-in');
+        }
+      }, 760);
+    }, 750);
   }
 
   navButtons.forEach(btn => {
@@ -231,6 +268,10 @@ function setupNavigation() {
   // Initial pill position
   const initialActive = document.querySelector('.nav-link.active');
   if (initialActive) {
+    const initialTarget = initialActive.getAttribute('data-nav-target');
+    if (initialTarget) {
+      activeTabId = initialTarget;
+    }
     setTimeout(() => updateSlidingPill(initialActive), 60);
   }
 
