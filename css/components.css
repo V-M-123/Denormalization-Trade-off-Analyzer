@@ -19,16 +19,24 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-4);
   height: 100%;
+  width: 100%;
+}
+
+.site-header .nav-container {
+  max-width: 1440px;
 }
 
 .brand-link {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
   color: var(--text-primary);
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .brand-badge {
@@ -41,20 +49,26 @@
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--accent);
+  flex-shrink: 0;
 }
 
 .nav-links {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  position: relative;
+  min-width: 0;
 }
 
 .nav-link {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: 8px 14px;
-  font-size: 14px;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 6px 12px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-body);
   border-radius: var(--radius-button);
@@ -62,6 +76,7 @@
   transition: all var(--transition-default);
   cursor: pointer;
   background: transparent;
+  flex-shrink: 0;
 }
 
 .nav-link:hover {
@@ -80,6 +95,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* Modal Buttons */
@@ -163,6 +180,11 @@
 .theme-toggle-btn:hover {
   border-color: var(--text-primary);
   background: var(--surface);
+}
+
+body.cursor-mode-trail,
+body.cursor-mode-trail * {
+  cursor: none !important;
 }
 
 /* Card Surface */

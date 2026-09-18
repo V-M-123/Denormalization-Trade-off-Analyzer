@@ -1,5 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
+import { CursorProvider, useCursor } from './context/CursorContext';
+import { PixelCursorTrail } from './components/ui/pixel-trail';
+import { MagneticCursor } from './components/ui/magnetic-cursor';
 import Navbar from './components/Navbar';
 import Workbench from './components/Workbench';
 import LearnSection from './components/LearnSection';
@@ -14,6 +17,7 @@ import { Database } from 'lucide-react';
 function AppContent() {
   const [activeTab, setActiveTab] = useState('analyzer');
   const [selectedPresetId, setSelectedPresetId] = useState('analytics-dashboard');
+  const { cursorMode } = useCursor();
   
   // Initialize inputs with the first preset
   const [inputs, setInputs] = useState(() => WORKLOAD_PRESETS[0].inputs);
@@ -43,8 +47,17 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
-      
+    <div className={`min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors ${
+      cursorMode === 'trail' ? 'cursor-none' : ''
+    }`}>
+      {/* Active Custom Cursor Overlays */}
+      {cursorMode === 'magnetic' && <MagneticCursor />}
+      {cursorMode === 'trail' && (
+        <div className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden">
+          <PixelCursorTrail fullScreen={false} className="w-full h-full" />
+        </div>
+      )}
+
       {/* 1. Header Navigation Bar */}
       <Navbar 
         activeTab={activeTab}
@@ -124,7 +137,9 @@ function AppContent() {
 export default function App() {
   return (
     <ThemeProvider>
-      <AppContent />
+      <CursorProvider>
+        <AppContent />
+      </CursorProvider>
     </ThemeProvider>
   );
 }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com; img-src 'self' data: https:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; connect-src 'self' http://localhost:4000 ws://localhost:* https:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com; img-src 'self' data: https:;">
   <title>Denormalization Trade-off Analyzer</title>
   <meta name="description" content="An interactive architectural evaluation tool comparing Relational Normalization (1NF-3NF) vs Denormalization.">
 
@@ -57,13 +57,33 @@
         <button type="button" class="nav-link" data-nav-target="tab-help" aria-selected="false">Help</button>
         <button type="button" class="nav-link" data-nav-target="tab-tests" aria-selected="false">Dev/Test Panel</button>
         <button type="button" class="nav-link" data-nav-target="tab-submit-schema" aria-selected="false">Submit Your Schema</button>
+        <button type="button" class="nav-link" data-nav-target="tab-my-schemas" aria-selected="false">My Databases</button>
       </nav>
 
-      <!-- Actions: Download & Theme Toggle -->
-      <div class="nav-actions">
+      <!-- Actions: User Auth, Download & Theme Toggle -->
+      <div class="nav-actions" style="display: flex; align-items: center; gap: var(--space-2);">
+        
+        <!-- Auth Controls -->
+        <button type="button" id="header-auth-btn" class="btn-ghost-outline" style="padding: 5px 12px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; min-height: 32px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Sign In</span>
+        </button>
+
+        <div id="header-user-pill" style="display: none; align-items: center; gap: 8px; font-size: 12px; background: var(--surface-elevated); border: 1px solid var(--border); padding: 4px 12px; border-radius: 9999px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span id="header-user-email" style="max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-primary); font-weight: 500;">User</span>
+          <button type="button" id="header-logout-btn" title="Sign Out" style="background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 0; display: flex; align-items: center;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+
         <button type="button" class="btn-accent-pill" data-action="open-download" title="Download Report">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           <span>Download Report</span>
+        </button>
+
+        <button type="button" id="cursor-toggle" class="theme-toggle-btn" aria-label="Toggle Custom Cursor Mode" title="Toggle Cursor Style">
+          <!-- Populated by js/cursor.js -->
         </button>
 
         <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Day/Night Mode" aria-pressed="true">
@@ -104,6 +124,23 @@
               <h2 style="font-size: 1.15rem;">Workload Characteristics</h2>
               <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">Configure table scale, query access patterns, and ACID criticality.</p>
             </div>
+          </div>
+
+          <!-- Active Custom Dataset Banner -->
+          <div id="active-dataset-banner" style="display: none; margin-bottom: var(--space-4); padding: 10px 14px; background: rgba(34, 211, 238, 0.08); border: 1px solid var(--accent); border-radius: var(--radius-card); align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent);"></span>
+              <div>
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); font-weight: 700; display: block;">Custom Schema Active</span>
+                <span style="font-size: 13px; color: var(--text-primary); font-weight: 600;">
+                  <span id="active-dataset-title">Custom Database</span>
+                  <span id="active-dataset-stats" style="color: var(--text-muted); font-size: 11px; margin-left: 6px; font-weight: normal;">(0 Tables, 0 FKs)</span>
+                </span>
+              </div>
+            </div>
+            <button type="button" id="btn-clear-custom-dataset" class="btn-ghost-outline" style="padding: 3px 10px; font-size: 11px; min-height: 26px;">
+              Reset to Presets
+            </button>
           </div>
 
           <!-- Presets Row -->
@@ -518,13 +555,13 @@
       <div style="margin-bottom: var(--space-8);">
         <div class="eyebrow">
           <span class="eyebrow-dot"></span>
-          <span>Academic Team & Guidance</span>
+          <span style="font-size: 15px;">Academic Team & Guidance</span>
         </div>
         <h1 id="dev-heading" style="margin-bottom: var(--space-2);">
           Developed By
         </h1>
         <p style="max-width: 720px; font-size: 1.1rem; color: var(--text-subhead);">
-          Academic Course Project — Database Management Systems (Digital Assignment Review).
+          Academic Course Project — Database Management Systems.
         </p>
       </div>
 
@@ -550,30 +587,31 @@
       <div class="grid-3">
         
         <div class="card" style="text-align: center;">
-          <div style="width: 72px; height: 72px; border-radius: var(--radius-pill); background: var(--surface-elevated); border: 2px solid var(--border); margin: 0 auto var(--space-3) auto; display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; font-size: 1.2rem;">
-            SL
-          </div>
-          <h3 style="font-size: 1.05rem;">Student Lead</h3>
-          <div style="font-family: var(--font-mono); font-size: 12px; color: var(--accent); margin: 4px 0;">Reg No: 21BCE1001</div>
-          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">Database Cost Modeling & Scoring Engine Logic</p>
+          <img src="/images/Vaibhav.jpg" 
+       alt="Vaibhav" 
+       style="width: 100px; height: 150px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); margin: 0 auto var(--space-3) auto; display: block;" 
+       />
+          <h3 style="font-size: 2rem;">Vaibhav</h3>
+          <div style="font-family: var(--font-mono); font-size: 19px; color: var(--accent); margin: 4px 0;">Reg No: 25BCE5818</div>
+          <!-- <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">Database Cost Modeling & Scoring Engine Logic</p> -->
         </div>
 
         <div class="card" style="text-align: center;">
-          <div style="width: 72px; height: 72px; border-radius: var(--radius-pill); background: var(--surface-elevated); border: 2px solid var(--border); margin: 0 auto var(--space-3) auto; display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; font-size: 1.2rem;">
-            TM
-          </div>
-          <h3 style="font-size: 1.05rem;">Team Member 2</h3>
-          <div style="font-family: var(--font-mono); font-size: 12px; color: var(--accent); margin: 4px 0;">Reg No: 21BCE1042</div>
-          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">UI/UX Architecture & Radar Visualization</p>
+          <img src="/images/Arpit.jpg" 
+     alt="Arpit" 
+     style="width: 100px; height: 150px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); margin: 0 auto var(--space-3) auto; display: block;" />
+          <h3 style="font-size: 2rem;">Arpit</h3>
+          <div style="font-family: var(--font-mono); font-size: 19px; color: var(--accent); margin: 4px 0;">Reg No: 21BCE1042</div>
+          <!-- <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">UI/UX Architecture & Radar Visualization</p> -->
         </div>
 
         <div class="card" style="text-align: center;">
-          <div style="width: 72px; height: 72px; border-radius: var(--radius-pill); background: var(--surface-elevated); border: 2px solid var(--border); margin: 0 auto var(--space-3) auto; display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; font-size: 1.2rem;">
-            TM
-          </div>
-          <h3 style="font-size: 1.05rem;">Team Member 3</h3>
-          <div style="font-family: var(--font-mono); font-size: 12px; color: var(--accent); margin: 4px 0;">Reg No: 21BCE1095</div>
-          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">Validation Testing & Client-Side PDF Generation</p>
+          <img src="/images/Adwit.jpg" 
+     alt="Adwit" 
+     style="width: 100px; height: 150px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); margin: 0 auto var(--space-3) auto; display: block;" />
+          <h3 style="font-size: 2rem;">Adwit</h3>
+          <div style="font-family: var(--font-mono); font-size: 19px; color: var(--accent); margin: 4px 0;">Reg No: 21BCE1095</div>
+          <!-- <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">Validation Testing & Client-Side PDF Generation</p> -->
         </div>
 
       </div>
@@ -790,63 +828,135 @@
 
       <div class="grid-2" style="align-items: start;">
         
-        <!-- Left: Upload & DDL Input Card -->
+        <!-- Left: Upload & DDL / Supabase Input Card -->
         <div class="card">
           <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
             <div>
-              <h2 style="font-size: 1.15rem;">Schema &amp; Workload Spec</h2>
-              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">Upload .sql, .csv, or .json file (Max 500MB) or enter definitions.</p>
+              <h2 style="font-size: 1.15rem;">Schema &amp; Workload Ingestion</h2>
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">Upload files (SQL/CSV/JSON max 500MB) or connect live to Supabase.</p>
             </div>
-            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-              <button type="button" id="btn-tab-load-sample" class="btn-ghost-outline" style="padding: 4px 8px; font-size: 11px; min-height: 28px;">
+            <!-- Mode Switcher (Clean SVGs, No Emojis) -->
+            <div class="segmented-group" style="grid-template-columns: 1fr 1fr; width: 270px; padding: 2px;">
+              <button type="button" id="btn-mode-file" class="segmented-btn active" style="font-size: 11px; padding: 5px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>File / DDL</span>
+              </button>
+              <button type="button" id="btn-mode-supabase" class="segmented-btn" style="font-size: 11px; padding: 5px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span>Live Supabase</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Mode 1: File / DDL Ingestion Panel -->
+          <div id="panel-mode-file">
+            <!-- Sample Buttons -->
+            <div style="display: flex; justify-content: flex-end; gap: 6px; margin-bottom: var(--space-3); flex-wrap: wrap;">
+              <button type="button" id="btn-tab-load-sample" class="btn-ghost-outline" style="padding: 3px 8px; font-size: 11px; min-height: 26px;">
                 Sample DDL
               </button>
-              <button type="button" id="btn-tab-load-sample-csv" class="btn-ghost-outline" style="padding: 4px 8px; font-size: 11px; min-height: 28px;">
+              <button type="button" id="btn-tab-load-sample-csv" class="btn-ghost-outline" style="padding: 3px 8px; font-size: 11px; min-height: 26px;">
                 Sample CSV
               </button>
-              <button type="button" id="btn-tab-load-sample-json" class="btn-ghost-outline" style="padding: 4px 8px; font-size: 11px; min-height: 28px;">
+              <button type="button" id="btn-tab-load-sample-json" class="btn-ghost-outline" style="padding: 3px 8px; font-size: 11px; min-height: 26px;">
                 Sample JSON
               </button>
             </div>
-          </div>
 
-          <!-- Drag and Drop Dropzone -->
-          <div id="tab-schema-drop-zone" style="border: 2px dashed var(--border); border-radius: var(--radius-card); padding: var(--space-5); text-align: center; cursor: pointer; transition: border-color var(--transition-fast); margin-bottom: var(--space-4); background: var(--surface-elevated);">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto var(--space-2); color: var(--accent);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <p style="font-size: 13px; margin-bottom: 2px; color: var(--text-primary); font-weight: 600;">Drag &amp; drop your SQL, CSV, or JSON file here, or click to browse</p>
-            <span style="font-size: 11px; color: var(--text-muted);">Supports SQL DDL, CSV datasets, and JSON schemas (Max 500MB)</span>
-            <input type="file" id="tab-input-schema-file" accept=".sql,.ddl,.csv,.json,.ndjson,.txt" style="display: none;">
-          </div>
-
-          <!-- DDL Textarea -->
-          <div class="form-group">
-            <label for="tab-input-schema-sql" class="form-label">SQL DDL Definition:</label>
-            <textarea id="tab-input-schema-sql" class="form-input" rows="8" style="font-family: var(--font-mono); font-size: 12px; resize: vertical;" placeholder="CREATE TABLE Customers (customer_id INT PRIMARY KEY, ...);&#10;CREATE TABLE Orders (order_id INT PRIMARY KEY, customer_id INT REFERENCES Customers(customer_id), ...);"></textarea>
-          </div>
-
-          <!-- Workload Quick Parameters -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-bottom: var(--space-4);">
-            <div>
-              <label for="tab-input-row-count" style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 2px;">Estimated Rows</label>
-              <input type="text" id="tab-input-row-count" class="form-input" value="10M">
+            <!-- Drag and Drop Dropzone -->
+            <div id="tab-schema-drop-zone" style="border: 2px dashed var(--border); border-radius: var(--radius-card); padding: var(--space-5); text-align: center; cursor: pointer; transition: border-color var(--transition-fast); margin-bottom: var(--space-4); background: var(--surface-elevated);">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto var(--space-2); color: var(--accent);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p style="font-size: 13px; margin-bottom: 2px; color: var(--text-primary); font-weight: 600;">Drag &amp; drop your SQL, CSV, or JSON file here, or click to browse</p>
+              <span style="font-size: 11px; color: var(--text-muted);">Supports SQL DDL, CSV datasets, and JSON schemas (Max 500MB)</span>
+              <input type="file" id="tab-input-schema-file" accept=".sql,.ddl,.csv,.json,.ndjson,.txt" style="display: none;">
             </div>
-            <div>
-              <label for="tab-input-dialect" style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 2px;">SQL Dialect</label>
-              <select id="tab-input-dialect" class="form-input" style="height: 36px; padding: 4px 8px; font-size: 12px;">
-                <option value="generic">Generic SQL</option>
-                <option value="postgres">PostgreSQL</option>
-                <option value="mysql">MySQL</option>
-                <option value="sqlite">SQLite</option>
-              </select>
+
+            <!-- DDL Textarea -->
+            <div class="form-group">
+              <label for="tab-input-schema-sql" class="form-label">SQL DDL Definition / Preview:</label>
+              <textarea id="tab-input-schema-sql" class="form-input" rows="8" style="font-family: var(--font-mono); font-size: 12px; resize: vertical;" placeholder="CREATE TABLE Customers (customer_id INT PRIMARY KEY, ...);&#10;CREATE TABLE Orders (order_id INT PRIMARY KEY, customer_id INT REFERENCES Customers(customer_id), ...);"></textarea>
+            </div>
+
+            <!-- Workload Quick Parameters -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-bottom: var(--space-4);">
+              <div>
+                <label for="tab-input-row-count" style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 2px;">Estimated Rows</label>
+                <input type="text" id="tab-input-row-count" class="form-input" value="10M">
+              </div>
+              <div>
+                <label for="tab-input-dialect" style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 2px;">SQL Dialect</label>
+                <select id="tab-input-dialect" class="form-input" style="height: 36px; padding: 4px 8px; font-size: 12px;">
+                  <option value="generic">Generic SQL</option>
+                  <option value="postgres">PostgreSQL</option>
+                  <option value="mysql">MySQL</option>
+                  <option value="sqlite">SQLite</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: var(--space-3); border-top: 1px solid var(--border-subtle);">
+              <span id="tab-schema-status" style="font-size: 11px; color: var(--text-muted);">Ready to analyze</span>
+              <button type="button" id="tab-btn-analyze" class="btn-accent-pill" style="padding: 8px 20px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span>Analyze Schema &amp; Workload</span>
+              </button>
             </div>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: var(--space-3); border-top: 1px solid var(--border-subtle);">
-            <span id="tab-schema-status" style="font-size: 11px; color: var(--text-muted);">Ready to analyze</span>
-            <button type="button" id="tab-btn-analyze" class="btn-accent-pill" style="padding: 8px 20px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              <span>Analyze Schema &amp; Workload</span>
-            </button>
+          <!-- Mode 2: Live Supabase Connection Panel -->
+          <div id="panel-mode-supabase" style="display: none;">
+            <div style="padding: var(--space-3); border-radius: var(--radius-card); background: var(--surface-elevated); border: 1px solid var(--border); margin-bottom: var(--space-4);">
+              <strong style="font-size: 12px; color: var(--accent); display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Direct Supabase (PostgreSQL) Live Connection
+              </strong>
+              <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 0; line-height: 1.5;">
+                In Supabase Dashboard: go to <strong>Project Settings → Database → Connection string → URI</strong> (or Transaction Pooler).
+                Copy the URI and paste it below with your database password.
+              </p>
+            </div>
+
+            <!-- Database Project Name -->
+            <div class="form-group">
+              <label for="tab-input-supabase-title" class="form-label">Database Name / Label:</label>
+              <input type="text" id="tab-input-supabase-title" class="form-input" style="font-size: 12px;" placeholder="e.g. My Production Supabase" value="Supabase Database">
+            </div>
+
+            <div class="form-group">
+              <label for="tab-input-supabase-uri" class="form-label">Supabase Connection URI (PostgreSQL):</label>
+              <input type="password" id="tab-input-supabase-uri" class="form-input" style="font-family: var(--font-mono); font-size: 12px;" placeholder="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                <span style="font-size: 10px; color: var(--text-muted);">SSL is automatically enforced (sslmode=require)</span>
+                <button type="button" id="btn-toggle-uri-visibility" class="btn-ghost-outline" style="padding: 2px 8px; font-size: 10px; min-height: 22px;">Show URI</button>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-bottom: var(--space-3);">
+              <div>
+                <label for="tab-input-supabase-schema" style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 2px;">Postgres Schema</label>
+                <input type="text" id="tab-input-supabase-schema" class="form-input" value="public" placeholder="public">
+              </div>
+              <div>
+                <label for="tab-input-supabase-row-count" style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 2px;">Target Workload Rows</label>
+                <input type="text" id="tab-input-supabase-row-count" class="form-input" value="Auto-detect from DB" placeholder="Auto-detect">
+              </div>
+            </div>
+
+            <!-- Save to Account Checkbox -->
+            <div style="margin-bottom: var(--space-4); padding: var(--space-2) var(--space-3); background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-sm); display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="tab-input-save-to-account" checked style="cursor: pointer;">
+              <label for="tab-input-save-to-account" style="font-size: 11px; color: var(--text-primary); cursor: pointer; margin: 0; user-select: none;">
+                Save database to my account for continuous schema drift &amp; change tracking
+              </label>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: var(--space-3); border-top: 1px solid var(--border-subtle);">
+              <span id="tab-supabase-status" style="font-size: 11px; color: var(--text-muted);">Ready to connect</span>
+              <button type="button" id="tab-btn-connect-supabase" class="btn-accent-pill" style="padding: 8px 20px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                <span>Connect &amp; Introspect Supabase</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -907,6 +1017,40 @@
 
     </section>
 
+    <!-- ================================================================= -->
+    <!-- TAB 7: MY SAVED DATABASES & DRIFT                                 -->
+    <!-- ================================================================= -->
+    <section id="tab-my-schemas" class="tab-section" style="display: none;" aria-labelledby="my-schemas-heading">
+      
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-4); margin-bottom: var(--space-6);">
+        <div>
+          <div class="eyebrow" style="margin-bottom: var(--space-2);">
+            <span class="eyebrow-dot"></span>
+            <span>Continuous Schema Tracking</span>
+          </div>
+          <h1 id="my-schemas-heading" style="font-size: 2rem; letter-spacing: -0.03em; margin-bottom: var(--space-2);">
+            My Saved Databases
+          </h1>
+          <p style="color: var(--text-secondary); max-width: 600px; font-size: 14px;">
+            Inspect your connected databases, analyze architectural trade-offs, and check for schema changes &amp; topological drift anytime.
+          </p>
+        </div>
+
+        <div style="display: flex; gap: var(--space-2);">
+          <button type="button" id="refresh-schemas-btn" class="btn-ghost-outline" style="padding: 6px 14px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            <span>Refresh</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Saved Schemas List Container -->
+      <div id="saved-schemas-container">
+        <!-- Rendered dynamically by js/savedSchemasManager.js -->
+      </div>
+
+    </section>
+
   </main>
 
   <!-- Academic Footer -->
@@ -923,7 +1067,7 @@
       <div>
         <span>Guided By: </span>
         <strong style="color: var(--text-primary);">Dr. Swaminathan A</strong>
-        <span> (Assistant Professor, SCOPE)</span>
+        <!-- <span> (Assistant Professor, SCOPE)</span> -->
       </div>
 
       <div style="font-family: var(--font-mono); font-size: 11px;">
@@ -974,6 +1118,104 @@
           <span style="color: var(--text-primary); font-weight: bold; font-size: 13px;">↓ TXT</span>
         </button>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- User Authentication Modal -->
+  <div id="auth-modal" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+    <div class="modal-content" style="max-width: 420px;">
+      <button type="button" id="close-auth-modal" class="modal-close-btn" aria-label="Close dialog">&times;</button>
+      
+      <div class="eyebrow" style="margin-bottom: 4px;">
+        <span class="eyebrow-dot"></span>
+        <span>Account &amp; Databases</span>
+      </div>
+      <h3 id="auth-modal-title" style="font-size: 18px; margin-bottom: var(--space-3); color: var(--text-primary);">
+        User Account
+      </h3>
+
+      <!-- Tab Switcher (Sign In vs Register) -->
+      <div class="segmented-group" style="grid-template-columns: 1fr 1fr; margin-bottom: var(--space-4); padding: 2px;">
+        <button type="button" id="auth-tab-login" class="segmented-btn active" style="font-size: 12px; padding: 6px;">Sign In</button>
+        <button type="button" id="auth-tab-register" class="segmented-btn" style="font-size: 12px; padding: 6px;">Create Account</button>
+      </div>
+
+      <!-- Feedback container -->
+      <div id="auth-feedback" style="display: none; margin-bottom: var(--space-3); font-size: 12px; padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm);"></div>
+
+      <!-- Form: Login -->
+      <form id="auth-form-login" style="display: flex; flex-direction: column; gap: var(--space-3);">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="login-email" class="form-label" style="font-size: 11px;">Email Address</label>
+          <input type="email" id="login-email" class="form-input" placeholder="you@company.com" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="login-password" class="form-label" style="font-size: 11px;">Password</label>
+          <div style="position: relative; display: flex; align-items: center;">
+            <input type="password" id="login-password" class="form-input" placeholder="••••••••" required style="padding-right: 36px; width: 100%;">
+            <button type="button" class="btn-toggle-password" data-target="login-password" aria-label="Toggle password visibility" style="position: absolute; right: 10px; background: none; border: none; padding: 0; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center;">
+              <svg class="icon-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="icon-eye-off" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn-accent-pill" style="margin-top: var(--space-2); padding: 8px; font-size: 13px; width: 100%;">
+          Sign In
+        </button>
+      </form>
+
+      <!-- Form: Register -->
+      <form id="auth-form-register" style="display: none; flex-direction: column; gap: var(--space-3);">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="reg-name" class="form-label" style="font-size: 11px;">Full Name</label>
+          <input type="text" id="reg-name" class="form-input" placeholder="Your Name" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="reg-email" class="form-label" style="font-size: 11px;">Email Address</label>
+          <input type="email" id="reg-email" class="form-input" placeholder="you@company.com" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="reg-password" class="form-label" style="font-size: 11px;">Password (min 6 characters)</label>
+          <div style="position: relative; display: flex; align-items: center;">
+            <input type="password" id="reg-password" class="form-input" placeholder="••••••••" minlength="6" required style="padding-right: 36px; width: 100%;">
+            <button type="button" class="btn-toggle-password" data-target="reg-password" aria-label="Toggle password visibility" style="position: absolute; right: 10px; background: none; border: none; padding: 0; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center;">
+              <svg class="icon-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="icon-eye-off" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn-accent-pill" style="margin-top: var(--space-2); padding: 8px; font-size: 13px; width: 100%;">
+          Create Account
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Database Drift & Diff Modal -->
+  <div id="diff-modal" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="diff-modal-title">
+    <div class="modal-content" style="max-width: 580px;">
+      <button type="button" id="close-diff-modal" class="modal-close-btn" aria-label="Close dialog">&times;</button>
+      
+      <div class="eyebrow" style="margin-bottom: 4px;">
+        <span class="eyebrow-dot"></span>
+        <span>Schema Drift Detector</span>
+      </div>
+      <h3 id="diff-modal-title" style="font-size: 18px; margin-bottom: var(--space-3); color: var(--text-primary);">
+        Live Schema Change Report
+      </h3>
+
+      <div id="diff-modal-body" style="margin-bottom: var(--space-4);">
+        <!-- Populated dynamically by js/savedSchemasManager.js -->
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: var(--space-2); border-top: 1px solid var(--border-subtle); padding-top: var(--space-3);">
+        <button type="button" class="btn-ghost-outline" onclick="document.getElementById('diff-modal').style.display = 'none';">
+          Close
+        </button>
+        <button type="button" id="diff-modal-sync-btn" class="btn-accent-pill" style="padding: 6px 16px; font-size: 12px; display: none;">
+          Apply &amp; Sync Changes
+        </button>
       </div>
     </div>
   </div>

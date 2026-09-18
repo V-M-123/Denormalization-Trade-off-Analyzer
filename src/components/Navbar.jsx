@@ -8,9 +8,13 @@ import {
   HelpCircle, 
   UserCheck, 
   Sliders, 
-  ShieldCheck 
+  ShieldCheck,
+  MousePointer,
+  Sparkles,
+  CircleDot
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useCursor } from '../context/CursorContext';
 
 export default function Navbar({ 
   activeTab, 
@@ -18,6 +22,7 @@ export default function Navbar({
   onOpenDownload 
 }) {
   const { theme, toggleTheme } = useTheme();
+  const { cursorMode, cycleCursorMode } = useCursor();
 
   const navTabs = [
     { id: 'analyzer', label: 'Analyzer', icon: Sliders },
@@ -84,6 +89,28 @@ export default function Navbar({
               <Download className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Download Report</span>
               <span className="sm:hidden">Report</span>
+            </button>
+
+            {/* Custom Cursor Mode Toggle */}
+            <button
+              onClick={cycleCursorMode}
+              className={`p-2 rounded-xl border transition-all flex items-center justify-center ${
+                cursorMode !== 'default'
+                  ? 'border-cyan-400 bg-cyan-500/15 text-cyan-600 dark:text-cyan-300 shadow-xs shadow-cyan-500/30'
+                  : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+              aria-label="Toggle Custom Cursor Mode"
+              title={
+                cursorMode === 'default'
+                  ? 'Cursor: Standard (Click to switch to Magnetic Dual-Ring)'
+                  : cursorMode === 'magnetic'
+                  ? 'Cursor: Magnetic Dual-Ring (Click to switch to Pixel Trail)'
+                  : 'Cursor: Aurora Pixel Trail (Click to reset to Standard)'
+              }
+            >
+              {cursorMode === 'default' && <MousePointer className="w-4 h-4" />}
+              {cursorMode === 'magnetic' && <CircleDot className="w-4 h-4 text-cyan-500 animate-pulse" />}
+              {cursorMode === 'trail' && <Sparkles className="w-4 h-4 text-emerald-500 animate-spin" style={{ animationDuration: '3s' }} />}
             </button>
 
             {/* Day / Night Mode Toggle */}

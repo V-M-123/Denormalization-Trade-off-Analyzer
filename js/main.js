@@ -10,7 +10,10 @@ import { PRESET_SCENARIOS } from './scenarios.js';
 import { renderTradeoffChart, toggleChartType } from './chart.js';
 import { downloadPdfReport, downloadDocReport, downloadTextReport } from './pdfExport.js';
 import { getInitialTheme, applyTheme, toggleTheme } from './theme.js';
+import { initCursor } from './cursor.js';
 import { setupSchemaUploader } from './schemaUploader.js';
+import { setupAuthUI } from './auth.js';
+import { setupSavedSchemasManager } from './savedSchemasManager.js';
 import { animate, stagger } from 'motion';
 
 // Application State
@@ -30,34 +33,97 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Setup Custom Cursor Switcher (Standard -> Magnetic Dual-Ring -> Aurora Pixel Trail)
+  initCursor();
+
   // 2. Setup Tab Navigation
   setupNavigation();
 
-  // 3. Setup Workload Presets
-  setupPresets();
+  // 3. Setup User Authentication & Session UI
+  setupAuthUI();
 
-  // 4. Setup Form Event Listeners & Live What-If Slider
-  setupForm();
+  // 4. Setup Saved Databases & Drift Change Tracking
+  setupSavedSchemasManager((schemaDetails) => {
+    // Populate DDL preview
+    const ddlTextarea = document.getElementById('tab-input-schema-sql');
+    if (ddlTextarea && schemaDetails.schema.ddl_content) {
+      ddlTextarea.value = schemaDetails.schema.ddl_content;
+    }
 
-  // 5. Setup Custom Schema Uploader & Diagnostics
-  setupSchemaUploader((customEval) => {
-    currentEvaluation = customEval;
-    renderResults(customEval);
+    // If an analysis run exists, load its evaluation
+    if (schemaDetails.runs && schemaDetails.runs.length > 0) {
+      const run = schemaDetails.runs[0];
+      const verdict = run.verdict || 'Hybrid';
+      const badgeClass = verdict.toLowerCase().includes('denorm') ? 'denorm' : verdict.toLowerCase().includes('norm') ? 'norm' : 'hybrid';
+      const explanation = run.recommendation_details || '';
+      const keyTakeaways = {
+        why: `Benchmark run loaded for ${schemaDetails.title || 'saved schema'}.`,
+        whatCouldChange: 'Modify workload parameters to recalculate trade-offs.'
+      };
+      const customEval = {
+        isCustomSchema: true,
+        datasetName: schemaDetails.title || 'Saved Database',
+        schemaSummary: {
+          tableCount: schemaDetails.schema.table_count || 1,
+          foreignKeysCount: schemaDetails.schema.foreign_keys_count || 0,
+          maxJoinDepth: schemaDetails.schema.max_join_depth || 1,
+          estimatedNormalForm: schemaDetails.schema.estimated_normal_form || '3NF'
+        },
+        verdict,
+        badgeClass,
+        scores: {
+          normalizedAverage: run.normalized_average,
+          denormalizedAverage: run.denormalized_average,
+          margin: run.confidence_margin
+        },
+        breakdown: run.scores_breakdown || {},
+        explanation,
+        keyTakeaways,
+        recommendation: {
+          verdict,
+          badgeClass,
+          explanation,
+          keyTakeaways
+        },
+        inputs: {
+          rowCount: run.workload_params?.rowCount || 1000000,
+          readPercent: run.workload_params?.readPercent || 80,
+          writePercent: run.workload_params?.writePercent || 20,
+          queryComplexity: 'medium',
+          storageCostSensitivity: 'medium',
+          dataConsistencyCriticality: 'high'
+        }
+      };
+      activateCustomDataset(customEval);
+      const analyzerNavBtn = document.querySelector('[data-nav-target="tab-analyzer"]');
+      if (analyzerNavBtn) analyzerNavBtn.click();
+    }
   });
 
-  // 6. Setup Chart Toggle Button
+  // 5. Setup Workload Presets
+  setupPresets();
+
+  // 6. Setup Form Event Listeners & Live What-If Slider
+  setupForm();
+
+  // 7. Setup Custom Schema Uploader & Diagnostics
+  setupSchemaUploader((customEval) => {
+    activateCustomDataset(customEval);
+  });
+
+  // 8. Setup Chart Toggle Button
   setupChartControls();
 
-  // 7. Setup Download Report Modal
+  // 9. Setup Download Report Modal
   setupDownloadModal();
 
-  // 8. Setup Dev/Test Runner Panel
+  // 10. Setup Dev/Test Runner Panel
   setupTestPanel();
 
-  // 9. Initial calculation with default Analytics Dashboard preset
+  // 11. Initial calculation with default Analytics Dashboard preset
   loadScenario(PRESET_SCENARIOS[1]);
 
-  // 10. ReactBits Spotlight Card Effect Initializer
+  // 12. ReactBits Spotlight Card Effect Initializer
   initSpotlightCards();
 });
 
@@ -142,12 +208,15 @@ function setupNavigation() {
       }
     });
 
-    // If switching to analyzer, ensure chart renders properly
+    // If switching to analyzer, ensure full analysis results and chart render cleanly
     if (targetId === 'tab-analyzer' && currentEvaluation) {
+      renderResults(currentEvaluation);
       setTimeout(() => {
         const isDay = document.documentElement.getAttribute('data-theme') === 'day';
         const canvas = document.getElementById('tradeoff-chart');
-        renderTradeoffChart(canvas, currentEvaluation.breakdown, isDay, currentChartType);
+        if (canvas && currentEvaluation.breakdown) {
+          renderTradeoffChart(canvas, currentEvaluation.breakdown, isDay, currentChartType);
+        }
       }, 50);
     }
   }
@@ -196,15 +265,106 @@ function setupPresets() {
   });
 }
 
+function formatNumberShorthand(num) {
+  if (!num) return '1M';
+  if (typeof num === 'string' && /[KMB]$/i.test(num)) return num;
+  const n = Number(num);
+  if (isNaN(n)) return String(num);
+  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+  return String(n);
+}
+
+/**
+ * Activates a custom uploaded or introspected database schema on the analytics dashboard
+ */
+function activateCustomDataset(customEval) {
+  currentEvaluation = customEval;
+
+  // 1. Show and configure Active Dataset Banner
+  const banner = document.getElementById('active-dataset-banner');
+  const titleEl = document.getElementById('active-dataset-title');
+  const statsEl = document.getElementById('active-dataset-stats');
+  if (banner) banner.style.display = 'flex';
+  if (titleEl) titleEl.textContent = customEval.datasetName || 'Custom Database Schema';
+  if (statsEl && customEval.schemaSummary) {
+    statsEl.textContent = `(${customEval.schemaSummary.tableCount} Tables, ${customEval.schemaSummary.foreignKeysCount} Foreign Keys, ${customEval.schemaSummary.maxJoinDepth} Join Hops)`;
+  }
+
+  // 2. Clear standard preset chips and show Custom chip
+  document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+  let customChip = document.getElementById('chip-custom-dataset');
+  const chipsContainer = document.getElementById('preset-chips-container');
+  if (!customChip && chipsContainer) {
+    customChip = document.createElement('button');
+    customChip.type = 'button';
+    customChip.id = 'chip-custom-dataset';
+    customChip.className = 'preset-chip active';
+    chipsContainer.prepend(customChip);
+  }
+  if (customChip) {
+    customChip.textContent = `★ ${customEval.datasetName || 'Custom Schema'}`;
+    customChip.classList.add('active');
+    customChip.style.display = 'inline-block';
+    customChip.onclick = () => {
+      document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+      customChip.classList.add('active');
+      renderResults(customEval);
+    };
+  }
+
+  // 3. Populate Workload form inputs to match the analyzed dataset
+  if (customEval.inputs) {
+    const rowInput = document.getElementById('input-row-count');
+    const readSlider = document.getElementById('input-read-slider');
+    const readInput = document.getElementById('input-read-ratio');
+    const writeInput = document.getElementById('input-write-ratio');
+
+    if (rowInput) rowInput.value = formatNumberShorthand(customEval.inputs.rowCount);
+    if (readSlider) readSlider.value = customEval.inputs.readPercent;
+    if (readInput) readInput.value = customEval.inputs.readPercent;
+    if (writeInput) writeInput.value = customEval.inputs.writePercent;
+
+    const dispRead = document.getElementById('display-read-val');
+    const dispWrite = document.getElementById('display-write-val');
+    if (dispRead) dispRead.textContent = `${customEval.inputs.readPercent}%`;
+    if (dispWrite) dispWrite.textContent = `${customEval.inputs.writePercent}%`;
+
+    setSegmentedValue('queryComplexity', customEval.inputs.queryComplexity);
+    setSegmentedValue('storageCostSensitivity', customEval.inputs.storageCostSensitivity);
+    setSegmentedValue('dataConsistencyCriticality', customEval.inputs.dataConsistencyCriticality);
+  }
+
+  // 4. Render results onto dashboard output
+  renderResults(customEval);
+}
+
 function loadScenario(scenario) {
   const form = document.getElementById('analyzer-form');
   if (!form) return;
+
+  // Reset custom dataset mode
+  const customBanner = document.getElementById('active-dataset-banner');
+  if (customBanner) customBanner.style.display = 'none';
+  const customChip = document.getElementById('chip-custom-dataset');
+  if (customChip) {
+    customChip.classList.remove('active');
+    customChip.style.display = 'none';
+  }
+  if (currentEvaluation) {
+    currentEvaluation.isCustomSchema = false;
+  }
 
   // Populate inputs
   document.getElementById('input-row-count').value = scenario.inputs.rowCount;
   document.getElementById('input-read-ratio').value = scenario.inputs.readPercent;
   document.getElementById('input-read-slider').value = scenario.inputs.readPercent;
   document.getElementById('input-write-ratio').value = scenario.inputs.writePercent;
+  const dispRead = document.getElementById('display-read-val');
+  const dispWrite = document.getElementById('display-write-val');
+  if (dispRead) dispRead.textContent = `${scenario.inputs.readPercent}%`;
+  if (dispWrite) dispWrite.textContent = `${scenario.inputs.writePercent}%`;
 
   // Segmented buttons
   setSegmentedValue('queryComplexity', scenario.inputs.queryComplexity);
@@ -325,6 +485,14 @@ function setupForm() {
     });
   }
 
+  // Clear Custom Dataset Button
+  const clearCustomBtn = document.getElementById('btn-clear-custom-dataset');
+  if (clearCustomBtn) {
+    clearCustomBtn.addEventListener('click', () => {
+      loadScenario(PRESET_SCENARIOS[1]); // Reset back to default preset
+    });
+  }
+
   // Calculate Submit
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -374,11 +542,169 @@ function evaluateForm() {
     dataConsistencyCriticality,
   };
 
-  const evaluation = calculateTradeoffScores(evalInputs);
+  let evaluation;
+  if (currentEvaluation && currentEvaluation.isCustomSchema && currentEvaluation.schemaSummary) {
+    evaluation = evaluateCustomTopology(currentEvaluation, evalInputs);
+  } else {
+    evaluation = calculateTradeoffScores(evalInputs);
+  }
   currentEvaluation = evaluation;
 
   // Update Output UI
   renderResults(evaluation);
+}
+
+function clampScore(val) {
+  return Math.max(1, Math.min(10, Math.round(val * 10) / 10));
+}
+
+/**
+ * Re-evaluates custom uploaded/introspected schema when workbench sliders change
+ */
+function evaluateCustomTopology(prevEval, workload) {
+  const summary = prevEval.schemaSummary || { maxJoinDepth: 2, tableCount: 3, foreignKeysCount: 2 };
+  const diagnostics = prevEval.diagnostics || { detectedRedundancies: [] };
+  const { rowCount, readPercent, writePercent, storageCostSensitivity, dataConsistencyCriticality } = workload;
+
+  const joinDepth = summary.maxJoinDepth;
+  const redundancyCount = (diagnostics.detectedRedundancies || []).length;
+
+  let normRead = 8.0 - (joinDepth * 0.7);
+  if (rowCount > 10000000) normRead -= 0.5;
+
+  let denormRead = 9.5;
+  if (redundancyCount > 0) denormRead = Math.min(10, denormRead + 0.3);
+  if (rowCount >= 10000000) denormRead -= 1.8;
+  else if (rowCount >= 2000000) denormRead -= 0.6;
+
+  normRead = clampScore(normRead);
+  denormRead = clampScore(denormRead);
+
+  let normWrite = 9.2;
+  if (writePercent > 40 && dataConsistencyCriticality === 'high') normWrite = 9.8;
+
+  const rewriteMultiplier = 1 + (redundancyCount * 0.35);
+  let denormWrite = 7.5 - ((writePercent / 100) * 5.0 * rewriteMultiplier);
+  if (rowCount > 5000000) denormWrite -= 1.0;
+
+  normWrite = clampScore(normWrite);
+  denormWrite = clampScore(denormWrite);
+
+  const normStorage = 9.5;
+  let denormStorage = 6.5 - (redundancyCount * 0.6);
+  if (storageCostSensitivity === 'high') denormStorage -= 2.0;
+  else if (storageCostSensitivity === 'medium') denormStorage -= 0.5;
+  denormStorage = clampScore(denormStorage);
+
+  const normIntegrity = 10.0;
+  let denormIntegrity = 7.0 - (redundancyCount * 0.8);
+  if (dataConsistencyCriticality === 'high') denormIntegrity -= 2.0;
+  else if (dataConsistencyCriticality === 'medium') denormIntegrity -= 1.0;
+  denormIntegrity = clampScore(denormIntegrity);
+
+  let normComplexity = 7.5 - (joinDepth * 0.8);
+  const denormComplexity = 9.5;
+  normComplexity = clampScore(normComplexity);
+
+  const breakdown = {
+    readPerformance: {
+      label: 'Read Performance',
+      normalized: normRead,
+      denormalized: denormRead,
+      justification: denormRead >= normRead
+        ? `Schema join depth (${joinDepth}) induces join overhead; denormalizing avoids ${joinDepth - 1} relational joins.`
+        : `At ${rowCount.toLocaleString()} rows, wide denormalized rows dilute RAM buffer pool hit ratio.`
+    },
+    writePerformance: {
+      label: 'Write Performance',
+      normalized: normWrite,
+      denormalized: denormWrite,
+      justification: normWrite > denormWrite
+        ? `Normalized updates alter 1 row per entity. Redundancies force multi-table rewrites (${writePercent}% write volume).`
+        : `Low write traffic keeps denormalization lock contention manageable.`
+    },
+    storageEfficiency: {
+      label: 'Storage Efficiency',
+      normalized: normStorage,
+      denormalized: denormStorage,
+      justification: `Normalized schema maintains zero duplicate columns. Denormalizing copies attributes across ${summary.tableCount} tables.`
+    },
+    dataIntegrity: {
+      label: 'Data Integrity',
+      normalized: normIntegrity,
+      denormalized: denormIntegrity,
+      justification: `ACID foreign keys enforce constraints across ${summary.foreignKeysCount} relations. Duplication risks drift.`
+    },
+    queryComplexity: {
+      label: 'Query Simplicity',
+      normalized: normComplexity,
+      denormalized: denormComplexity,
+      justification: `Normalized queries require navigating ${joinDepth}-table JOIN paths. Denormalized queries are single-table lookups.`
+    }
+  };
+
+  const normTotal = (normRead * (readPercent / 100)) +
+                    (normWrite * (writePercent / 100)) +
+                    (normStorage * 0.4) +
+                    (normIntegrity * (dataConsistencyCriticality === 'high' ? 1.0 : dataConsistencyCriticality === 'medium' ? 0.7 : 0.4)) +
+                    (normComplexity * 0.4);
+
+  const denormTotal = (denormRead * (readPercent / 100)) +
+                      (denormWrite * (writePercent / 100)) +
+                      (denormStorage * 0.4) +
+                      (denormIntegrity * (dataConsistencyCriticality === 'high' ? 1.0 : dataConsistencyCriticality === 'medium' ? 0.7 : 0.4)) +
+                      (denormComplexity * 0.4);
+
+  const delta = denormTotal - normTotal;
+  let verdict = 'Hybrid';
+  let badgeClass = 'hybrid';
+  let explanation = '';
+  const keyTakeaways = { why: '', whatCouldChange: '' };
+
+  if (delta > 0.45 && readPercent >= 75 && dataConsistencyCriticality !== 'high') {
+    verdict = 'Prefer Denormalization';
+    badgeClass = 'denorm';
+    explanation = `Your uploaded schema (${prevEval.datasetName || 'custom schema'}) contains a join depth of ${joinDepth} across ${summary.tableCount} tables. With ${readPercent}% read traffic, pre-joining frequently accessed attributes delivers substantial latency gains while low write traffic (${writePercent}%) minimizes update anomalies.`;
+    keyTakeaways.why = `Read latency reduction (Denorm: ${denormRead}/10 vs Norm: ${normRead}/10) eliminates ${joinDepth - 1} nested JOIN operations.`;
+    keyTakeaways.whatCouldChange = `If writes surpass 35% or foreign key updates become concurrent, write amplification will favor Normalization.`;
+  } else if (delta < -0.45 || writePercent >= 40 || dataConsistencyCriticality === 'high') {
+    verdict = 'Prefer Normalization';
+    badgeClass = 'norm';
+    explanation = `Given the schema's ${summary.foreignKeysCount} foreign key constraints, high write ratio (${writePercent}%), and ${dataConsistencyCriticality} consistency requirement, strict Normalization (3NF) is strongly recommended to protect ACID integrity.`;
+    keyTakeaways.why = `Single-row update atomicity (${normWrite}/10 vs ${denormWrite}/10) prevents multi-table lock contention and synchronization drift.`;
+    keyTakeaways.whatCouldChange = `If read SLAs are breached on reporting endpoints, consider selective materialized views rather than widespread physical denormalization.`;
+  } else {
+    verdict = 'Hybrid';
+    badgeClass = 'hybrid';
+    explanation = `The schema (${prevEval.datasetName || 'custom schema'}) shows balanced demands: keep transactional core entities in 3NF while selectively caching or denormalizing high-frequency foreign key lookups.`;
+    keyTakeaways.why = `Neither pure approach is optimal: deep joins (${joinDepth}) hinder read queries, but writing to duplicated columns threatens data integrity.`;
+    keyTakeaways.whatCouldChange = `A traffic swing towards >85% reads would trigger denormalization recommendations for hot tables.`;
+  }
+
+  const normAvg = Number(((normRead + normWrite + normStorage + normIntegrity + normComplexity) / 5).toFixed(1));
+  const denormAvg = Number(((denormRead + denormWrite + denormStorage + denormIntegrity + denormComplexity) / 5).toFixed(1));
+
+  return {
+    isCustomSchema: true,
+    datasetName: prevEval.datasetName || 'Custom Database',
+    schemaSummary: summary,
+    diagnostics,
+    generatedDDL: prevEval.generatedDDL,
+    inputs: workload,
+    scores: {
+      normalizedAverage: normAvg,
+      denormalizedAverage: denormAvg
+    },
+    breakdown,
+    keyTakeaways,
+    recommendation: {
+      verdict,
+      badgeClass,
+      explanation,
+      keyTakeaways
+    },
+    timestamp: new Date().toISOString()
+  };
 }
 
 function renderValidationErrors(errors) {
@@ -401,7 +727,32 @@ function renderValidationErrors(errors) {
  * Render Results (Recommendation, Scores, and Chart)
  */
 function renderResults(evaluation) {
-  const { breakdown, scores, recommendation } = evaluation;
+  if (!evaluation) return;
+  const breakdown = evaluation.breakdown || {};
+  const scores = evaluation.scores || { normalizedAverage: 0, denormalizedAverage: 0 };
+
+  // Normalize recommendation safely to prevent any undefined property access
+  const rawRec = evaluation.recommendation || evaluation;
+  const verdict = rawRec.verdict || 'Hybrid';
+  const badgeClass = rawRec.badgeClass || (
+    verdict.toLowerCase().includes('denorm') ? 'denorm' :
+    verdict.toLowerCase().includes('norm') ? 'norm' : 'hybrid'
+  );
+  const explanation = rawRec.explanation || '';
+  const keyTakeaways = rawRec.keyTakeaways || {
+    why: evaluation.keyTakeaways?.why || 'Analysis completed based on schema topology and workload profile.',
+    whatCouldChange: evaluation.keyTakeaways?.whatCouldChange || 'Adjust workload parameters to explore different trade-offs.'
+  };
+
+  const recommendation = {
+    verdict,
+    badgeClass,
+    explanation,
+    keyTakeaways
+  };
+
+  // Attach back so downstream consumers (e.g. export reports) have it
+  evaluation.recommendation = recommendation;
 
   // 1. Recommendation Banner
   const banner = document.getElementById('recommendation-banner');
@@ -413,12 +764,18 @@ function renderResults(evaluation) {
 
   if (banner) {
     banner.className = `recommendation-banner ${recommendation.badgeClass === 'denorm' ? 'prefer-denormalization' : recommendation.badgeClass === 'norm' ? 'prefer-normalization' : 'hybrid'}`;
-    verdictTag.className = `verdict-tag ${recommendation.badgeClass}`;
-    verdictTag.textContent = `${recommendation.verdict} (Norm: ${scores.normalizedAverage} vs Denorm: ${scores.denormalizedAverage})`;
-    verdictHeading.textContent = recommendation.verdict;
-    explanationEl.textContent = recommendation.explanation;
-    whyEl.textContent = recommendation.keyTakeaways.why;
-    flipEl.textContent = recommendation.keyTakeaways.whatCouldChange;
+    if (verdictTag) {
+      verdictTag.className = `verdict-tag ${recommendation.badgeClass}`;
+      if (evaluation.isCustomSchema && evaluation.datasetName) {
+        verdictTag.textContent = `${recommendation.verdict} • ${evaluation.datasetName} (Norm: ${scores.normalizedAverage} vs Denorm: ${scores.denormalizedAverage})`;
+      } else {
+        verdictTag.textContent = `${recommendation.verdict} (Norm: ${scores.normalizedAverage} vs Denorm: ${scores.denormalizedAverage})`;
+      }
+    }
+    if (verdictHeading) verdictHeading.textContent = recommendation.verdict;
+    if (explanationEl) explanationEl.textContent = recommendation.explanation;
+    if (whyEl) whyEl.textContent = recommendation.keyTakeaways?.why || '';
+    if (flipEl) flipEl.textContent = recommendation.keyTakeaways?.whatCouldChange || '';
   }
 
   // 2. Score Cards
@@ -535,20 +892,60 @@ function setupDownloadModal() {
   const btnDoc = document.getElementById('dl-doc');
   const btnTxt = document.getElementById('dl-txt');
 
+  function triggerDownload(actionFn, btn, label) {
+    if (!currentEvaluation) evaluateForm();
+    const evalData = currentEvaluation || {
+      inputs: {
+        rowCount: 1000000,
+        readPercent: 80,
+        writePercent: 20,
+        queryComplexity: 'medium',
+        storageCostSensitivity: 'medium',
+        dataConsistencyCriticality: 'high'
+      }
+    };
+
+    const originalContent = btn.innerHTML;
+    btn.style.pointerEvents = 'none';
+
+    try {
+      actionFn(evalData);
+      btn.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+          <div>
+            <strong style="font-size: 13px; color: var(--accent); display: block;">${label} Exported</strong>
+            <span style="font-size: 11px; color: var(--text-muted);">Downloaded to your device</span>
+          </div>
+          <span style="color: var(--accent); font-weight: bold; font-size: 13px;">✓ READY</span>
+        </div>
+      `;
+    } catch (err) {
+      console.error(`Error downloading ${label}:`, err);
+      btn.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+          <div>
+            <strong style="font-size: 13px; color: #ef4444; display: block;">Export Failed</strong>
+            <span style="font-size: 11px; color: var(--text-muted);">${err.message || 'Check console for details'}</span>
+          </div>
+          <span style="color: #ef4444; font-weight: bold; font-size: 13px;">✕</span>
+        </div>
+      `;
+    } finally {
+      setTimeout(() => {
+        btn.innerHTML = originalContent;
+        btn.style.pointerEvents = '';
+      }, 2000);
+    }
+  }
+
   if (btnPdf) {
-    btnPdf.addEventListener('click', () => {
-      if (currentEvaluation) downloadPdfReport(currentEvaluation);
-    });
+    btnPdf.addEventListener('click', () => triggerDownload(downloadPdfReport, btnPdf, 'Executive PDF'));
   }
   if (btnDoc) {
-    btnDoc.addEventListener('click', () => {
-      if (currentEvaluation) downloadDocReport(currentEvaluation);
-    });
+    btnDoc.addEventListener('click', () => triggerDownload(downloadDocReport, btnDoc, 'Word Document'));
   }
   if (btnTxt) {
-    btnTxt.addEventListener('click', () => {
-      if (currentEvaluation) downloadTextReport(currentEvaluation);
-    });
+    btnTxt.addEventListener('click', () => triggerDownload(downloadTextReport, btnTxt, 'Plain Text'));
   }
 }
 
