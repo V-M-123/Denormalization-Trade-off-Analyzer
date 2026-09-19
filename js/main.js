@@ -140,15 +140,12 @@ function handleThemeChange(newTheme) {
  */
 function initSpotlightCards() {
   document.addEventListener('pointermove', (e) => {
-    const cards = document.querySelectorAll('.card, .dim-card, .recommendation-banner, .preset-chip');
-    cards.forEach(card => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      card.style.setProperty('--mouse-x', `${x}px`);
-      card.style.setProperty('--mouse-y', `${y}px`);
-    });
-  });
+    const card = e.target.closest('.card, .dim-card, .recommendation-banner, .preset-chip');
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+    card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+  }, { passive: true });
 }
 
 /**
@@ -168,7 +165,11 @@ function setupNavigation() {
   }
 
   function updateSlidingPill(activeBtn) {
-    if (!slidingPill || !activeBtn) return;
+    if (!slidingPill) return;
+    if (!activeBtn) {
+      animate(slidingPill, { opacity: 0 }, { duration: 0.2 });
+      return;
+    }
     const { offsetLeft, offsetWidth, offsetHeight, offsetTop } = activeBtn;
     animate(slidingPill, {
       x: offsetLeft,
@@ -179,11 +180,26 @@ function setupNavigation() {
     }, { duration: 0.25, ease: [0.16, 1, 0.3, 1] });
   }
 
-  let activeTabId = 'tab-analyzer';
+  let activeTabId = 'tab-home';
   let tabSwitchTimeout = null;
 
-  function switchTab(targetId) {
+  function triggerAuroraSweep() {
+    const overlay = document.getElementById('aurora-sweep-overlay');
+    if (overlay) {
+      overlay.classList.remove('sweeping');
+      void overlay.offsetWidth;
+      overlay.classList.add('sweeping');
+      setTimeout(() => overlay.classList.remove('sweeping'), 900);
+    }
+  }
+
+  function switchTab(targetId, withSweep = false) {
     if (!targetId || targetId === activeTabId) return;
+
+    // Trigger the Cinematic Aurora Sweep when entering the Analyzer from Home
+    if (withSweep || (activeTabId === 'tab-home' && targetId === 'tab-analyzer')) {
+      triggerAuroraSweep();
+    }
 
     let targetBtn = null;
     navButtons.forEach(btn => {
@@ -197,8 +213,17 @@ function setupNavigation() {
       }
     });
 
-    if (targetBtn) {
-      updateSlidingPill(targetBtn);
+    const brandLink = document.querySelector('.brand-link');
+    if (targetId === 'tab-home') {
+      if (brandLink) brandLink.classList.add('active');
+      updateSlidingPill(null);
+    } else {
+      if (brandLink) brandLink.classList.remove('active');
+      if (targetBtn) {
+        updateSlidingPill(targetBtn);
+      } else {
+        updateSlidingPill(null);
+      }
     }
 
     const currentSection = document.getElementById(activeTabId);
@@ -265,22 +290,68 @@ function setupNavigation() {
     });
   });
 
-  // Initial pill position
+  // Front Page CTA Handlers
+  const heroLaunchBtn = document.getElementById('hero-launch-btn');
+  if (heroLaunchBtn) {
+    heroLaunchBtn.addEventListener('click', () => {
+      switchTab('tab-analyzer', true);
+    });
+  }
+
+  const bottomLaunchBtn = document.querySelector('.btn-bottom-launch');
+  if (bottomLaunchBtn) {
+    bottomLaunchBtn.addEventListener('click', () => {
+      switchTab('tab-analyzer', true);
+    });
+  }
+
+  const heroUploadBtn = document.getElementById('hero-upload-btn');
+  if (heroUploadBtn) {
+    heroUploadBtn.addEventListener('click', () => {
+      switchTab('tab-submit-schema');
+    });
+  }
+
+  const heroGuideBtn = document.getElementById('hero-guide-btn');
+  if (heroGuideBtn) {
+    heroGuideBtn.addEventListener('click', () => {
+      switchTab('tab-learn');
+    });
+  }
+
+  document.querySelectorAll('.btn-scenario-trigger').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.getAttribute('data-scenario-index'), 10);
+      if (!isNaN(idx) && PRESET_SCENARIOS[idx]) {
+        loadScenario(PRESET_SCENARIOS[idx]);
+        switchTab('tab-analyzer', true);
+      }
+    });
+  });
+
+  // Initial pill position & active tab state
   const initialActive = document.querySelector('.nav-link.active');
+  const brandLink = document.querySelector('.brand-link');
+
   if (initialActive) {
     const initialTarget = initialActive.getAttribute('data-nav-target');
     if (initialTarget) {
       activeTabId = initialTarget;
     }
+    if (brandLink) brandLink.classList.remove('active');
     setTimeout(() => updateSlidingPill(initialActive), 60);
+  } else {
+    // Starting on Home tab via brand icon
+    activeTabId = 'tab-home';
+    if (brandLink) brandLink.classList.add('active');
+    if (slidingPill) slidingPill.style.opacity = '0';
   }
 
-  // Logo also links to Analyzer tab
-  const brandLink = document.querySelector('.brand-link');
+  // Database icon / Logo links to Home tab
   if (brandLink) {
     brandLink.addEventListener('click', (e) => {
       e.preventDefault();
-      switchTab('tab-analyzer');
+      switchTab('tab-home');
     });
   }
 }
@@ -452,6 +523,17 @@ function setupForm() {
   const resetBtn = document.getElementById('btn-reset');
   const liveToggle = document.getElementById('live-what-if-toggle');
 
+  let rafEvalId = null;
+  const triggerLiveEvaluation = () => {
+    if (liveToggle && liveToggle.checked) {
+      if (rafEvalId) cancelAnimationFrame(rafEvalId);
+      rafEvalId = requestAnimationFrame(() => {
+        evaluateForm();
+        rafEvalId = null;
+      });
+    }
+  };
+
   // Slider <-> Read/Write ratio synchronization
   readSlider.addEventListener('input', () => {
     const val = parseInt(readSlider.value, 10);
@@ -459,9 +541,7 @@ function setupForm() {
     writeInput.value = 100 - val;
     document.getElementById('display-read-val').textContent = `${val}%`;
     document.getElementById('display-write-val').textContent = `${100 - val}%`;
-    if (liveToggle && liveToggle.checked) {
-      evaluateForm();
-    }
+    triggerLiveEvaluation();
   });
 
   readInput.addEventListener('input', () => {
@@ -472,9 +552,7 @@ function setupForm() {
     writeInput.value = 100 - val;
     document.getElementById('display-read-val').textContent = `${val}%`;
     document.getElementById('display-write-val').textContent = `${100 - val}%`;
-    if (liveToggle && liveToggle.checked) {
-      evaluateForm();
-    }
+    triggerLiveEvaluation();
   });
 
   writeInput.addEventListener('input', () => {
@@ -486,15 +564,11 @@ function setupForm() {
     readSlider.value = r;
     document.getElementById('display-read-val').textContent = `${r}%`;
     document.getElementById('display-write-val').textContent = `${w}%`;
-    if (liveToggle && liveToggle.checked) {
-      evaluateForm();
-    }
+    triggerLiveEvaluation();
   });
 
   rowInput.addEventListener('input', () => {
-    if (liveToggle && liveToggle.checked) {
-      evaluateForm();
-    }
+    triggerLiveEvaluation();
   });
 
   // Segmented button groups
@@ -822,34 +896,66 @@ function renderResults(evaluation) {
   // 2. Score Cards
   const cardsContainer = document.getElementById('dimension-cards-container');
   if (cardsContainer) {
-    cardsContainer.innerHTML = '';
-    Object.values(breakdown).forEach(dim => {
-      const card = document.createElement('div');
-      card.className = 'dim-card';
-      card.innerHTML = `
-        <div class="dim-card-header">
-          <span class="dim-card-title">${dim.label}</span>
-          <span style="font-size: 10px; font-family: var(--font-mono); color: var(--text-muted); text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px;">
-            ${dim.denormalized > dim.normalized 
-              ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Denorm Favored' 
-              : dim.normalized > dim.denormalized 
-                ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--indicator-norm)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Norm Favored' 
-                : 'Tied'}
-          </span>
-        </div>
-        <div class="dim-score-row">
-          <span style="color: var(--indicator-norm);">Norm: ${dim.normalized} / 10</span>
-          <span style="color: var(--text-muted);">vs</span>
-          <span style="color: var(--accent);">Denorm: ${dim.denormalized} / 10</span>
-        </div>
-        <p class="dim-justification">${dim.justification}</p>
-      `;
-      cardsContainer.appendChild(card);
-    });
+    const dimList = Object.values(breakdown);
+    const existingCards = cardsContainer.children;
 
-    // 21st.dev / ReactBits Staggered Reveal Animation
-    if (cardsContainer.children.length > 0) {
-      animate(cardsContainer.children, { opacity: [0, 1], y: [14, 0] }, { delay: stagger(0.04), duration: 0.28, ease: [0.16, 1, 0.3, 1] });
+    if (existingCards.length === dimList.length && dimList.length > 0) {
+      // In-place update: fast textContent / innerHTML updates without destroying DOM nodes
+      dimList.forEach((dim, idx) => {
+        const card = existingCards[idx];
+        const titleEl = card.querySelector('.dim-card-title');
+        const badgeEl = card.querySelector('.dim-card-header span:last-child');
+        const scoreRowEl = card.querySelector('.dim-score-row');
+        const justEl = card.querySelector('.dim-justification');
+
+        if (titleEl && titleEl.textContent !== dim.label) titleEl.textContent = dim.label;
+        if (badgeEl) {
+          const badgeHtml = dim.denormalized > dim.normalized 
+            ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Denorm Favored' 
+            : dim.normalized > dim.denormalized 
+              ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--indicator-norm)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Norm Favored' 
+              : 'Tied';
+          if (badgeEl.innerHTML !== badgeHtml) badgeEl.innerHTML = badgeHtml;
+        }
+        if (scoreRowEl) {
+          scoreRowEl.innerHTML = `
+            <span style="color: var(--indicator-norm);">Norm: ${dim.normalized} / 10</span>
+            <span style="color: var(--text-muted);">vs</span>
+            <span style="color: var(--accent);">Denorm: ${dim.denormalized} / 10</span>
+          `;
+        }
+        if (justEl && justEl.textContent !== dim.justification) justEl.textContent = dim.justification;
+      });
+    } else {
+      cardsContainer.innerHTML = '';
+      dimList.forEach(dim => {
+        const card = document.createElement('div');
+        card.className = 'dim-card';
+        card.innerHTML = `
+          <div class="dim-card-header">
+            <span class="dim-card-title">${dim.label}</span>
+            <span style="font-size: 10px; font-family: var(--font-mono); color: var(--text-muted); text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px;">
+              ${dim.denormalized > dim.normalized 
+                ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Denorm Favored' 
+                : dim.normalized > dim.denormalized 
+                  ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--indicator-norm)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Norm Favored' 
+                  : 'Tied'}
+            </span>
+          </div>
+          <div class="dim-score-row">
+            <span style="color: var(--indicator-norm);">Norm: ${dim.normalized} / 10</span>
+            <span style="color: var(--text-muted);">vs</span>
+            <span style="color: var(--accent);">Denorm: ${dim.denormalized} / 10</span>
+          </div>
+          <p class="dim-justification">${dim.justification}</p>
+        `;
+        cardsContainer.appendChild(card);
+      });
+
+      // 21st.dev / ReactBits Staggered Reveal Animation on initial mount/preset change
+      if (cardsContainer.children.length > 0) {
+        animate(cardsContainer.children, { opacity: [0, 1], y: [14, 0] }, { delay: stagger(0.04), duration: 0.28, ease: [0.16, 1, 0.3, 1] });
+      }
     }
   }
 

@@ -5,6 +5,8 @@
 
 let chartInstance = null;
 let currentChartType = 'radar'; // 'radar' or 'bar'
+let lastCanvas = null;
+let lastThemeMode = null;
 
 export function renderTradeoffChart(canvasElement, breakdown, isDayMode = false, forcedType = null) {
   if (!canvasElement) return null;
@@ -44,6 +46,20 @@ export function renderTradeoffChart(canvasElement, breakdown, isDayMode = false,
     breakdown.queryComplexity.denormalized,
   ];
 
+  // In-place update: if chart instance exists on the same canvas with same type and theme,
+  // update data arrays directly and avoid costly tear-down and re-allocation.
+  if (
+    chartInstance &&
+    lastCanvas === canvasElement &&
+    chartInstance.config?.type === currentChartType &&
+    lastThemeMode === isDayMode
+  ) {
+    chartInstance.data.datasets[0].data = normData;
+    chartInstance.data.datasets[1].data = denormData;
+    chartInstance.update('none');
+    return chartInstance;
+  }
+
   // Palette from theme
   const textColor = isDayMode ? '#121a11' : '#ddffdc';
   const gridColor = isDayMode ? 'rgba(194, 212, 192, 0.6)' : 'rgba(72, 83, 70, 0.4)';
@@ -54,6 +70,8 @@ export function renderTradeoffChart(canvasElement, breakdown, isDayMode = false,
     chartInstance.destroy();
   }
 
+  lastCanvas = canvasElement;
+  lastThemeMode = isDayMode;
   const ctx = canvasElement.getContext('2d');
 
   if (currentChartType === 'radar') {

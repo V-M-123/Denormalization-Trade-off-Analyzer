@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/tab-backgrounds.css">
 
   <!-- External CDNs: Chart.js & jsPDF -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -41,17 +42,17 @@
   <header class="site-header" role="banner">
     <div class="container nav-container">
       
-      <!-- Brand / Logo -->
-      <a href="#analyzer" class="brand-link" aria-label="Denormalization Trade-off Analyzer Home">
+      <!-- Brand / Logo (Click to go Home) -->
+      <a href="#home" class="brand-link active" id="brand-home-link" aria-label="Denormalization Trade-off Analyzer Home" title="Click to go Home">
         <span class="brand-badge" aria-hidden="true">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
         </span>
-        <span>Denormalization Analyzer</span>
+        <span class="brand-text">Denormalization Analyzer</span>
       </a>
 
       <!-- Primary Navigation Tabs -->
       <nav class="nav-links" role="navigation" aria-label="Main Navigation">
-        <button type="button" class="nav-link active" data-nav-target="tab-analyzer" aria-selected="true">Analyzer</button>
+        <button type="button" class="nav-link" data-nav-target="tab-analyzer" aria-selected="false">Analyzer</button>
         <button type="button" class="nav-link" data-nav-target="tab-learn" aria-selected="false">Learn</button>
         <button type="button" class="nav-link" data-nav-target="tab-developed-by" aria-selected="false">Developed By</button>
         <button type="button" class="nav-link" data-nav-target="tab-help" aria-selected="false">Help</button>
@@ -82,7 +83,7 @@
           <span>Download Report</span>
         </button>
 
-        <button type="button" id="cursor-toggle" class="theme-toggle-btn" aria-label="Toggle Custom Cursor Mode" title="Toggle Cursor Style">
+        <button type="button" id="cursor-toggle" class="cursor-mode-toggle-btn" aria-label="Toggle Custom Cursor Mode" title="Toggle Cursor Style">
           <!-- Populated by js/cursor.js -->
         </button>
 
@@ -94,12 +95,222 @@
     </div>
   </header>
 
+  <!-- Cinematic Aurora Sweep Transition Overlay -->
+  <div id="aurora-sweep-overlay" class="aurora-sweep-overlay" aria-hidden="true">
+    <div class="aurora-sweep-beam"></div>
+  </div>
+
   <main class="container" style="padding-top: var(--space-8); padding-bottom: var(--space-12);" role="main">
 
     <!-- ================================================================= -->
-    <!-- TAB 1: ANALYZER (HOME)                                            -->
+    <!-- TAB 0: FRONT PAGE / HOME LANDING                                  -->
     <!-- ================================================================= -->
-    <section id="tab-analyzer" class="tab-section" aria-labelledby="analyzer-heading">
+    <section id="tab-home" class="tab-section" aria-labelledby="home-heading">
+      
+      <!-- Hero Header -->
+      <div class="home-hero">
+        <div class="home-hero-badge">
+          <span class="eyebrow-dot"></span>
+          <span>Architectural Decision Engine</span>
+        </div>
+        <h1 id="home-heading">
+          Navigate the Trade-offs Between Normalization &amp; Denormalization
+        </h1>
+        <p class="home-hero-subtitle">
+          An interactive decision intelligence system designed to model workload profiles, quantify join latency vs write amplification, and provide deterministic database architecture recommendations.
+        </p>
+        
+        <!-- Primary CTAs -->
+        <div class="home-hero-actions">
+          <button type="button" id="hero-launch-btn" class="btn-hero-launch" title="Launch Interactive Analyzer">
+            <span>Launch Interactive Analyzer</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+          <button type="button" id="hero-upload-btn" class="btn-hero-secondary" title="Upload Schema or DDL">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>Submit Your Schema / DDL</span>
+          </button>
+          <button type="button" id="hero-guide-btn" class="btn-hero-secondary" title="Explore Theory &amp; Guide">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <span>Read Educational Guide</span>
+          </button>
+        </div>
+
+        <!-- Quick Architecture Metrics Pill Strip -->
+        <div style="display: flex; align-items: center; justify-content: center; gap: var(--space-6); flex-wrap: wrap; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border-subtle); padding-top: var(--space-6);">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span><strong>5 Core</strong> Evaluated Dimensions</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span><strong>100K to 1B+</strong> Row Capacity</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span><strong>SQL, CSV, JSON</strong> Ingestion</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span><strong>Zero Bias</strong> Mathematical Scoring</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: The 5 Core Engineering Dimensions -->
+      <div class="home-section-header">
+        <div class="eyebrow" style="margin-bottom: var(--space-2);">
+          <span class="eyebrow-dot"></span>
+          <span>Architectural Vectors</span>
+        </div>
+        <h2>The 5 Trade-off Dimensions</h2>
+        <p>Evaluating database designs across every engineering compromise before committing schemas to production.</p>
+      </div>
+
+      <div class="home-dimensions-grid">
+        <div class="home-dimension-card glass-card">
+          <div class="home-dim-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h3 class="home-dim-title">Query Latency</h3>
+          <p class="home-dim-desc">Measures join penalty, index scan depths, and read latency at massive row scales.</p>
+          <span class="home-dim-tag">Favors Denormalization in Read Skews</span>
+        </div>
+
+        <div class="home-dimension-card glass-card">
+          <div class="home-dim-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          </div>
+          <h3 class="home-dim-title">Write Amplification</h3>
+          <p class="home-dim-desc">Quantifies cascading updates, table lock contention, and redundant field maintenance.</p>
+          <span class="home-dim-tag">Favors Normalization in Write Skews</span>
+        </div>
+
+        <div class="home-dimension-card glass-card">
+          <div class="home-dim-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          </div>
+          <h3 class="home-dim-title">Storage Overhead</h3>
+          <p class="home-dim-desc">Calculates bytes per tuple, index footprint inflation, and disk page cache pressure.</p>
+          <span class="home-dim-tag">Favors 3NF Normalization</span>
+        </div>
+
+        <div class="home-dimension-card glass-card">
+          <div class="home-dim-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3 class="home-dim-title">Data Consistency</h3>
+          <p class="home-dim-desc">Evaluates update anomaly risks, foreign key referential integrity, and ACID resilience.</p>
+          <span class="home-dim-tag">Critical for Financial &amp; OLTP</span>
+        </div>
+
+        <div class="home-dimension-card glass-card">
+          <div class="home-dim-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <h3 class="home-dim-title">Maintainability</h3>
+          <p class="home-dim-desc">Analyzes schema refactoring friction, migration burden, and code complexity over time.</p>
+          <span class="home-dim-tag">Favors Clean Normalized Models</span>
+        </div>
+      </div>
+
+      <!-- Section: 3-Step Process -->
+      <div class="home-section-header">
+        <div class="eyebrow" style="margin-bottom: var(--space-2);">
+          <span class="eyebrow-dot"></span>
+          <span>Engine Architecture</span>
+        </div>
+        <h2>How The Analyzer Works</h2>
+        <p>A deterministic modeling methodology combining relational algebra with production workload dynamics.</p>
+      </div>
+
+      <div class="home-pipeline-grid">
+        <div class="home-pipeline-step glass-card">
+          <div class="home-step-num">01</div>
+          <h3>Characterize Workload</h3>
+          <p>Define read/write ratios, target row volume (100K to 1B+), query join complexity, and storage sensitivity tolerances.</p>
+        </div>
+
+        <div class="home-pipeline-step glass-card">
+          <div class="home-step-num">02</div>
+          <h3>Mathematical Evaluation</h3>
+          <p>The engine computes multi-dimensional cost functions evaluating join overhead vs update amplification penalties across 1NF–3NF vs denormalized schemas.</p>
+        </div>
+
+        <div class="home-pipeline-step glass-card">
+          <div class="home-step-num">03</div>
+          <h3>Actionable Architecture Verdict</h3>
+          <p>Receive an objective verdict (Prefer Normalization, Prefer Denormalization, or Hybrid) with radar visualizations and full exportable audit reports.</p>
+        </div>
+      </div>
+
+      <!-- Section: Workload Presets Showcase -->
+      <div class="home-section-header">
+        <div class="eyebrow" style="margin-bottom: var(--space-2);">
+          <span class="eyebrow-dot"></span>
+          <span>Scenario Modeling</span>
+        </div>
+        <h2>Benchmark Common Scenarios</h2>
+        <p>Instantly launch pre-configured architectural archetypes directly into the interactive simulator.</p>
+      </div>
+
+      <div class="home-scenarios-grid">
+        <div class="home-scenario-card glass-card">
+          <div>
+            <h4>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              <span>Read-Heavy Analytics</span>
+            </h4>
+            <p>95% Reads, 5% Writes, 50M records. High join depth creates query bottlenecks that favor selective denormalization.</p>
+          </div>
+          <button type="button" class="btn-ghost-outline btn-scenario-trigger" data-scenario-index="1" style="width: 100%; justify-content: center; font-size: 0.85rem;">
+            <span>Simulate Analytics Preset &rarr;</span>
+          </button>
+        </div>
+
+        <div class="home-scenario-card glass-card">
+          <div>
+            <h4>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              <span>High-Write IoT Ingestion</span>
+            </h4>
+            <p>10% Reads, 90% Writes, 500M records. High write amplification hazards make denormalization dangerous; favors 3NF.</p>
+          </div>
+          <button type="button" class="btn-ghost-outline btn-scenario-trigger" data-scenario-index="2" style="width: 100%; justify-content: center; font-size: 0.85rem;">
+            <span>Simulate IoT Preset &rarr;</span>
+          </button>
+        </div>
+
+        <div class="home-scenario-card glass-card">
+          <div>
+            <h4>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              <span>Financial Banking / OLTP</span>
+            </h4>
+            <p>Balanced 60/40 workload with zero tolerance for update anomalies. Requires strict third normal form consistency.</p>
+          </div>
+          <button type="button" class="btn-ghost-outline btn-scenario-trigger" data-scenario-index="0" style="width: 100%; justify-content: center; font-size: 0.85rem;">
+            <span>Simulate Banking Preset &rarr;</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom Call to Action -->
+      <div class="home-bottom-cta">
+        <h2>Ready to Architect Your Database?</h2>
+        <p>Test your own workload parameters or upload your schema to run real-time join depth and write amplification analysis.</p>
+        <button type="button" class="btn-hero-launch btn-bottom-launch" title="Launch Interactive Analyzer">
+          <span>Launch Interactive Analyzer</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- TAB 1: ANALYZER (WORKBENCH)                                       -->
+    <!-- ================================================================= -->
+    <section id="tab-analyzer" class="tab-section sr-only" style="display: none;" aria-labelledby="analyzer-heading">
       
       <!-- Hero Header -->
       <div style="margin-bottom: var(--space-8);">
@@ -591,7 +802,7 @@
        alt="Vaibhav" 
        style="width: 100px; height: 150px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); margin: 0 auto var(--space-3) auto; display: block;" 
        />
-          <h3 style="font-size: 2rem;">Vaibhav</h3>
+          <h3 style="font-size: 2rem;">Vaibhav Malpani</h3>
           <div style="font-family: var(--font-mono); font-size: 19px; color: var(--accent); margin: 4px 0;">Reg No: 25BCE5818</div>
           <!-- <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">Database Cost Modeling & Scoring Engine Logic</p> -->
         </div>
@@ -600,7 +811,7 @@
           <img src="/images/Arpit.jpg" 
      alt="Arpit" 
      style="width: 100px; height: 150px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); margin: 0 auto var(--space-3) auto; display: block;" />
-          <h3 style="font-size: 2rem;">Arpit</h3>
+          <h3 style="font-size: 2rem;">Arpit Juyal</h3>
           <div style="font-family: var(--font-mono); font-size: 19px; color: var(--accent); margin: 4px 0;">Reg No: 21BCE1042</div>
           <!-- <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">UI/UX Architecture & Radar Visualization</p> -->
         </div>
@@ -609,7 +820,7 @@
           <img src="/images/Adwit.jpg" 
      alt="Adwit" 
      style="width: 100px; height: 150px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); margin: 0 auto var(--space-3) auto; display: block;" />
-          <h3 style="font-size: 2rem;">Adwit</h3>
+          <h3 style="font-size: 2rem;">Adwit Tiwari</h3>
           <div style="font-family: var(--font-mono); font-size: 19px; color: var(--accent); margin: 4px 0;">Reg No: 21BCE1095</div>
           <!-- <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">Validation Testing & Client-Side PDF Generation</p> -->
         </div>
