@@ -1,29 +1,14 @@
-/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 */
-/* Modal — Style Reference Design Tokens */
+/* ==============================================================================
+   SHADCN-VUE / SHADCN-UI DESIGN SYSTEM TOKENS (ZINC + EMERALD PRESET)
+   Clean, modern, developer-first aesthetic with crisp hairline borders,
+   subtle shadows, and high-contrast typography in both Dark and Light modes.
+   ============================================================================== */
 
 :root {
-  /* Modal Brand Palette */
-  --color-void-black: #000000;
-  --color-ground-iron: #181818;
-  --color-carbon-veil: #212525;
-  --color-circuit-border: #485346;
-  --color-phosphor-blue-black: #1f2a33;
-  --color-charcoal-rust: #231c1c;
-  --color-lime-pulse: #7fee64;
-  --color-phosphor-white: #ddffdc;
-  --color-mint-frost: #def0dd;
-  --color-sage-60: #8cab87;
-  --color-sage-40: #677d64;
-  --color-moss-70: #9cbf93;
-  --color-moss-80: #aed2a4;
-  --color-fern-link: #859984;
-  --color-deep-fern: #697368;
-  --color-pine-15: #3e4a3c;
-
-  /* Typography */
-  --font-display: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Font Families */
+  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: 'Fira Mono', 'IBM Plex Mono', 'Courier New', Courier, monospace;
+  --font-mono: 'Fira Mono', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Spacing Scale (4px base) */
   --space-1: 4px;
@@ -36,80 +21,142 @@
   --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
-  --space-20: 80px;
 
-  /* Radii */
-  --radius-card: 8px;
-  --radius-button: 12px;
+  /* Corner Radii (shadcn standard: 0.5rem - 0.75rem) */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-button: 6px;
+  --radius-card: 10px;
+  --radius-input: 6px;
   --radius-pill: 9999px;
-  --radius-input: 8px;
-  --radius-code: 12px;
+  --radius-code: 8px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.15), 0 4px 6px -4px rgb(0 0 0 / 0.15);
 
   /* Transitions */
-  --transition-default: 300ms ease-out;
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-default: 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Default Theme: Dark (Phosphor terminal in a darkened server room) */
+/* ==============================================================================
+   DARK THEME (Default: shadcn Zinc Dark)
+   Background: #09090b | Card: #0f0f12 | Border: #27272a | Foreground: #fafafa
+   ============================================================================== */
 :root,
 [data-theme="night"] {
-  --bg: var(--color-void-black);
-  --surface: var(--color-ground-iron);
-  --surface-elevated: var(--color-carbon-veil);
-  --surface-code: var(--color-charcoal-rust);
-  --border: var(--color-circuit-border);
-  --border-subtle: var(--color-phosphor-blue-black);
-  --text-primary: var(--color-phosphor-white);
-  --text-body: var(--color-sage-60);
-  --text-muted: var(--color-sage-40);
-  --text-eyebrow: var(--color-moss-70);
-  --text-subhead: var(--color-moss-80);
-  --text-link: var(--color-fern-link);
-  --accent: var(--color-lime-pulse);
-  --accent-text: var(--color-void-black);
+  /* Core shadcn tokens */
+  --bg: #09090b;
+  --surface: #09090b;
+  --surface-card: #0d0d10;
+  --surface-elevated: #141418;
+  --surface-muted: #1c1c21;
+  --surface-code: #141418;
+
+  --border: #27272a;
+  --border-subtle: #1e1e22;
+
+  --text-primary: #fafafa;
+  --text-body: #a1a1aa;
+  --text-muted: #71717a;
+  --text-eyebrow: #10b981;
+  --text-subhead: #a1a1aa;
+  --text-link: #38bdf8;
+
+  --primary: #fafafa;
+  --primary-foreground: #18181b;
+
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+
+  --muted: #1c1c21;
+  --muted-foreground: #a1a1aa;
+
+  /* Accent: Emerald Green (shadcn Emerald preset) */
+  --accent: #10b981;
+  --accent-hover: #059669;
+  --accent-text: #000000;
+  --accent-muted: rgba(16, 185, 129, 0.12);
+
+  --ring: #3f3f46;
 
   /* Functional Indicators */
   --indicator-norm: #60a5fa;
-  --indicator-denorm: var(--color-lime-pulse);
+  --indicator-denorm: #10b981;
   --indicator-hybrid: #c084fc;
   --error: #f87171;
-  --error-bg: rgba(248, 113, 113, 0.12);
-  --success: var(--color-lime-pulse);
+  --error-bg: rgba(239, 68, 68, 0.12);
+  --success: #10b981;
+  --warning: #f59e0b;
+  --blue: #3b82f6;
 
-  --chart-grid: rgba(72, 83, 70, 0.35);
+  /* Radar Chart Tokens */
+  --chart-grid: rgba(63, 63, 70, 0.4);
   --chart-norm-fill: rgba(96, 165, 250, 0.2);
   --chart-norm-stroke: #60a5fa;
-  --chart-denorm-fill: rgba(127, 238, 100, 0.2);
-  --chart-denorm-stroke: var(--color-lime-pulse);
+  --chart-denorm-fill: rgba(16, 185, 129, 0.2);
+  --chart-denorm-stroke: #10b981;
 }
 
-/* Light Mode Theme: Day (Clean, high-contrast daylight terminal) */
+/* ==============================================================================
+   LIGHT THEME (shadcn Zinc Light)
+   Background: #ffffff | Card: #ffffff | Border: #e4e4e7 | Foreground: #09090b
+   ============================================================================== */
 [data-theme="day"] {
-  --bg: #f4f7f4;
+  /* Core shadcn tokens */
+  --bg: #ffffff;
   --surface: #ffffff;
-  --surface-elevated: var(--color-mint-frost);
-  --surface-code: #eaf1ea;
-  --border: #c2d4c0;
-  --border-subtle: #dbe8da;
-  --text-primary: #121a11;
-  --text-body: #2f402d;
-  --text-muted: #475e45;
-  --text-eyebrow: #2d5a27;
-  --text-subhead: #223b20;
-  --text-link: #1b6313;
-  --accent: #15803d;
+  --surface-card: #ffffff;
+  --surface-elevated: #f4f4f5;
+  --surface-muted: #f4f4f5;
+  --surface-code: #f4f4f5;
+
+  --border: #e4e4e7;
+  --border-subtle: #f4f4f5;
+
+  --text-primary: #09090b;
+  --text-body: #52525b;
+  --text-muted: #71717a;
+  --text-eyebrow: #059669;
+  --text-subhead: #71717a;
+  --text-link: #0284c7;
+
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+
+  /* Accent: Emerald Green */
+  --accent: #059669;
+  --accent-hover: #047857;
   --accent-text: #ffffff;
+  --accent-muted: rgba(5, 150, 105, 0.1);
+
+  --ring: #18181b;
 
   /* Functional Indicators */
   --indicator-norm: #2563eb;
-  --indicator-denorm: #16a34a;
+  --indicator-denorm: #059669;
   --indicator-hybrid: #7c3aed;
-  --error: #dc2626;
+  --error: #ef4444;
   --error-bg: #fee2e2;
-  --success: #16a34a;
+  --success: #059669;
+  --warning: #d97706;
+  --blue: #2563eb;
 
-  --chart-grid: rgba(194, 212, 192, 0.6);
+  /* Radar Chart Tokens */
+  --chart-grid: rgba(228, 228, 231, 0.85);
   --chart-norm-fill: rgba(37, 99, 235, 0.15);
   --chart-norm-stroke: #2563eb;
-  --chart-denorm-fill: rgba(22, 163, 74, 0.2);
-  --chart-denorm-stroke: #16a34a;
+  --chart-denorm-fill: rgba(5, 150, 105, 0.15);
+  --chart-denorm-stroke: #059669;
 }

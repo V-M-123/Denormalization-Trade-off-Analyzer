@@ -1,24 +1,23 @@
-/**
- * Chart Visualization Module
- * Handles Chart.js 5-axis Radar & Grouped Bar chart rendering and theme updates.
- */
+import Chart from 'chart.js/auto';
+
+// Guarantee Chart is available across all modules
+if (typeof window !== 'undefined' && !window.Chart) {
+  window.Chart = Chart;
+}
 
 let chartInstance = null;
 let currentChartType = 'radar'; // 'radar' or 'bar'
 let lastCanvas = null;
 let lastThemeMode = null;
+let lastRenderedBreakdown = null;
 
 export function renderTradeoffChart(canvasElement, breakdown, isDayMode = false, forcedType = null) {
   if (!canvasElement) return null;
   if (forcedType) currentChartType = forcedType;
+  if (breakdown) lastRenderedBreakdown = breakdown;
 
-  // Verify Chart.js availability
-  if (typeof window.Chart === 'undefined') {
-    canvasElement.parentElement.innerHTML = `
-      <div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px;">
-        <p>Chart.js CDN library is unavailable or offline.</p>
-        <p>Numerical scores are available in the table below.</p>
-      </div>`;
+  const ChartCtor = window.Chart || Chart;
+  if (!ChartCtor) {
     return null;
   }
 
@@ -225,3 +224,16 @@ export function getChartImageBase64() {
   }
   return null;
 }
+
+export function resizeChart() {
+  if (chartInstance) {
+    try {
+      chartInstance.resize();
+    } catch (e) {
+      console.warn('Could not resize chart:', e);
+    }
+  } else if (lastCanvas && lastRenderedBreakdown) {
+    renderTradeoffChart(lastCanvas, lastRenderedBreakdown, lastThemeMode, currentChartType);
+  }
+}
+

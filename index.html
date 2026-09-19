@@ -44,7 +44,7 @@
       <!-- Brand / Logo (Click to go Home) -->
       <a href="#home" class="brand-link active" id="brand-home-link" aria-label="Denormalization Trade-off Analyzer Home" title="Click to go Home">
         <span class="brand-badge" aria-hidden="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
         </span>
         <span class="brand-text">Denormalization Analyzer</span>
       </a>
@@ -61,26 +61,21 @@
       </nav>
 
       <!-- Actions: User Auth, Download & Theme Toggle -->
-      <div class="nav-actions" style="display: flex; align-items: center; gap: var(--space-2);">
+      <div class="nav-actions">
         
         <!-- Auth Controls -->
-        <button type="button" id="header-auth-btn" class="btn-ghost-outline" style="padding: 5px 12px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; min-height: 32px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <button type="button" id="header-auth-btn" class="btn-ghost-outline" style="padding: 7px 16px; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; min-height: 38px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <span>Sign In</span>
         </button>
 
-        <div id="header-user-pill" style="display: none; align-items: center; gap: 8px; font-size: 12px; background: var(--surface-elevated); border: 1px solid var(--border); padding: 4px 12px; border-radius: 9999px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <span id="header-user-email" style="max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-primary); font-weight: 500;">User</span>
+        <div id="header-user-pill" style="display: none; align-items: center; gap: 10px; font-size: 13px; background: var(--surface-elevated); border: 1px solid var(--border); padding: 6px 14px; border-radius: 9999px; min-height: 38px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span id="header-user-email" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-primary); font-weight: 500;">User</span>
           <button type="button" id="header-logout-btn" title="Sign Out" style="background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 0; display: flex; align-items: center;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           </button>
         </div>
-
-        <button type="button" class="btn-accent-pill" data-action="open-download" title="Download Report">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span>Download Report</span>
-        </button>
 
         <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Day/Night Mode" aria-pressed="true">
           <!-- Populated by js/theme.js -->
@@ -95,7 +90,7 @@
     <div class="aurora-sweep-beam"></div>
   </div>
 
-  <main class="container" style="padding-top: var(--space-8); padding-bottom: var(--space-12);" role="main">
+  <main class="container tab-stage" style="padding-top: var(--space-8); padding-bottom: var(--space-12);" role="main">
 
     <!-- ================================================================= -->
     <!-- TAB 0: FRONT PAGE / HOME LANDING                                  -->
@@ -473,10 +468,18 @@
           
           <!-- Recommendation Banner -->
           <div id="recommendation-banner" class="recommendation-banner prefer-denormalization" aria-live="polite">
-            <span id="recommendation-verdict-tag" class="verdict-tag denorm">Prefer Denormalization</span>
-            <h2 id="recommendation-heading" style="font-size: 1.5rem; margin-bottom: var(--space-2);">
-              Prefer Denormalization
-            </h2>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: var(--space-2);">
+              <div>
+                <span id="recommendation-verdict-tag" class="verdict-tag denorm">Prefer Denormalization</span>
+                <h2 id="recommendation-heading" style="font-size: 1.5rem; margin-top: 4px; margin-bottom: var(--space-2);">
+                  Prefer Denormalization
+                </h2>
+              </div>
+              <button type="button" id="btn-download-report" class="btn-accent-pill" data-action="open-download" title="Download Report" style="padding: 6px 14px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Download Report</span>
+              </button>
+            </div>
             <p id="recommendation-explanation" style="font-size: 13px; color: var(--text-body); line-height: 1.6;">
               <!-- Populated by js/scoring.js -->
             </p>
@@ -505,14 +508,16 @@
 
           <!-- Chart Card -->
           <div class="card">
-            <div class="card-header">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
               <div>
                 <h3 style="font-size: 1.1rem;">Trade-off Visualization (0–10 Scale)</h3>
                 <span style="font-size: 11px; color: var(--text-muted);">Comparing Normalized (3NF) vs. Denormalized across the 5 dimensions</span>
               </div>
-              <button type="button" id="btn-toggle-chart-type" class="btn-ghost-outline" style="padding: 4px 12px; min-height: 32px; font-size: 12px;">
-                Switch to Bar Chart
-              </button>
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <button type="button" id="btn-toggle-chart-type" class="btn-ghost-outline" style="padding: 4px 12px; min-height: 32px; font-size: 12px;">
+                  Switch to Bar Chart
+                </button>
+              </div>
             </div>
 
             <div style="position: relative; height: 340px; width: 100%;">
@@ -807,7 +812,7 @@
      alt="Arpit" 
      style="width: 100px; height: 150px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); margin: 0 auto var(--space-3) auto; display: block;" />
           <h3 style="font-size: 2rem;">Arpit Juyal</h3>
-          <div style="font-family: var(--font-mono); font-size: 19px; color: var(--accent); margin: 4px 0;">Reg No: 21BCE1042</div>
+          <div style="font-family: var(--font-mono); font-size: 19px; color: var(--accent); margin: 4px 0;">Reg No: 25BCE5817</div>
           <!-- <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">UI/UX Architecture & Radar Visualization</p> -->
         </div>
 
@@ -816,7 +821,7 @@
      alt="Adwit" 
      style="width: 100px; height: 150px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); margin: 0 auto var(--space-3) auto; display: block;" />
           <h3 style="font-size: 2rem;">Adwit Tiwari</h3>
-          <div style="font-family: var(--font-mono); font-size: 19px; color: var(--accent); margin: 4px 0;">Reg No: 21BCE1095</div>
+          <div style="font-family: var(--font-mono); font-size: 19px; color: var(--accent); margin: 4px 0;">Reg No: 25BCE5473</div>
           <!-- <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;">Validation Testing & Client-Side PDF Generation</p> -->
         </div>
 
@@ -830,81 +835,124 @@
     <section id="tab-help" class="tab-section sr-only" style="display: none;" aria-labelledby="help-heading">
       
       <div style="margin-bottom: var(--space-8);">
-        <div class="eyebrow">
+        <div class="eyebrow" style="font-size: 12px; margin-bottom: 8px;">
           <span class="eyebrow-dot"></span>
-          <span>User Manual & Guide</span>
+          <span>User Manual &amp; Guide</span>
         </div>
-        <h1 id="help-heading" style="margin-bottom: var(--space-2);">
-          Help & Operational Instructions
+        <h1 id="help-heading" style="margin-bottom: var(--space-3); font-size: 2.2rem; letter-spacing: -0.02em;">
+          Help &amp; Operational Instructions
         </h1>
-        <p style="max-width: 720px; font-size: 1.1rem; color: var(--text-subhead);">
+        <p style="max-width: 820px; font-size: 1.2rem; line-height: 1.6; color: var(--text-subhead);">
           Complete instructions on navigating the application, entering inputs, and interpreting trade-off scores.
         </p>
       </div>
 
-      <div class="card" style="margin-bottom: var(--space-6);">
-        <h2 style="font-size: 1.2rem; margin-bottom: var(--space-2);">What the Website Does</h2>
-        <p style="font-size: 14px; line-height: 1.6; color: var(--text-body);">
+      <div class="card" style="margin-bottom: var(--space-6); padding: var(--space-6) var(--space-7);">
+        <h2 style="font-size: 1.35rem; margin-bottom: var(--space-3);">What the Website Does</h2>
+        <p style="font-size: 15.5px; line-height: 1.75; color: var(--text-body); margin-bottom: var(--space-3);">
           The <strong>Denormalization Trade-off Analyzer</strong> models the performance, storage, and consistency consequences of converting a normalized relational database (3NF) into a denormalized flat schema.
         </p>
-        <p style="font-size: 14px; line-height: 1.6; color: var(--text-body);">
+        <p style="font-size: 15.5px; line-height: 1.75; color: var(--text-body); margin-bottom: 0;">
           Users provide workload attributes—such as estimated row count, read/write ratio, query complexity, storage cost sensitivity, and consistency criticality. The application computes 0–10 scores across 5 dimensions, visualizes the trade-offs on a radar chart, and recommends whether to <strong>Prefer Normalization</strong>, <strong>Prefer Denormalization</strong>, or adopt a <strong>Hybrid</strong> architecture.
         </p>
       </div>
 
-      <div class="card" style="margin-bottom: var(--space-6);">
-        <h2 style="font-size: 1.2rem; margin-bottom: var(--space-4);">Step-by-Step Instructions</h2>
-        <div style="display: flex; flex-direction: column; gap: var(--space-4); font-size: 13px;">
+      <!-- Demo & Walkthrough Video Section -->
+      <div class="card" style="margin-bottom: var(--space-6); padding: var(--space-6) var(--space-7);">
+        <div class="card-header" style="margin-bottom: var(--space-4);">
           <div>
-            <strong style="color: var(--text-primary); display: block;">1. How to navigate to the analyzer:</strong>
-            <p style="color: var(--text-muted); margin-bottom: 0;">Click the "Analyzer" tab in the top navigation bar at any time.</p>
-          </div>
-          <div>
-            <strong style="color: var(--text-primary); display: block;">2. How to fill each input field:</strong>
-            <p style="color: var(--text-muted); margin-bottom: 0;">
-              • <strong>Row count:</strong> Enter row count with optional shorthand (e.g., 50K, 2M, 50M) or click a preset chip.<br>
-              • <strong>Read / Write ratio:</strong> Drag the slider or enter percentages; values always sum to 100%.<br>
-              • <strong>Query complexity:</strong> Select Simple (1-2 joins), Medium (3-4 joins), or Complex (5+ joins).<br>
-              • <strong>Storage sensitivity:</strong> Select Low, Medium, or High depending on disk/RAM cost constraints.<br>
-              • <strong>Consistency criticality:</strong> Select Low (eventual consistency), Medium, or High (strict ACID).
+            <div class="eyebrow" style="margin-bottom: 6px; font-size: 12px;">
+              <span class="eyebrow-dot"></span>
+              <span>Interactive Walkthrough</span>
+            </div>
+            <h2 style="font-size: 1.35rem; margin-bottom: 6px;">Application Walkthrough &amp; Demo Video</h2>
+            <p style="font-size: 14.5px; line-height: 1.6; color: var(--text-muted); margin-bottom: 0;">
+              Watch this visual demonstration and conceptual guide explaining table decomposition, write amplification trade-offs, and how to use the analyzer.
             </p>
           </div>
+          <a href="https://www.youtube.com/watch?v=GFQaEYEc8_8" target="_blank" rel="noopener noreferrer" class="btn-ghost-outline" style="padding: 8px 16px; font-size: 13.5px; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;" title="Open video on YouTube">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>Watch on YouTube</span>
+          </a>
+        </div>
+
+        <div style="position: relative; aspect-ratio: 16/9; width: 100%; border-radius: var(--radius-card); overflow: hidden; background: #000; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.25);">
+          <iframe 
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
+            src="https://www.youtube-nocookie.com/embed/GFQaEYEc8_8?rel=0" 
+            title="Database Normalization vs Denormalization Application Walkthrough &amp; Demo"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            allowfullscreen>
+          </iframe>
+        </div>
+
+        <div style="margin-top: var(--space-5); padding: var(--space-4) var(--space-5); background: var(--surface-elevated); border: 1px solid var(--border); border-radius: var(--radius-card); display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px; color: var(--text-primary); font-weight: 600; font-size: 15px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>What You'll Learn in this Walkthrough:</span>
+          </div>
+          <ul style="list-style-type: disc; padding-left: 24px; margin: 0; font-size: 14.5px; line-height: 1.7; display: grid; gap: 6px; color: var(--text-muted);">
+            <li>How relational tables decompose from 1NF to 3NF to eliminate duplicate data and modification anomalies.</li>
+            <li>How read-heavy architectures utilize denormalization to eliminate high-latency join operations.</li>
+            <li>Why write-dominant workloads suffer severe write amplification penalties when denormalized.</li>
+            <li>How to configure workload inputs and interpret the analyzer's 5-dimensional trade-off radar chart.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: var(--space-6); padding: var(--space-6) var(--space-7);">
+        <h2 style="font-size: 1.35rem; margin-bottom: var(--space-5);">Step-by-Step Instructions</h2>
+        <div style="display: flex; flex-direction: column; gap: var(--space-5);">
           <div>
-            <strong style="color: var(--text-primary); display: block;">3. What each button does:</strong>
-            <p style="color: var(--text-muted); margin-bottom: 0;">
-              • <strong>Calculate:</strong> Recomputes scores and renders recommendation banner and radar chart.<br>
-              • <strong>Reset:</strong> Restores baseline default parameters.<br>
-              • <strong>Load Scenario:</strong> Auto-fills the form with preset workload profiles (Small OLTP, Analytics Dashboard, Mixed).
-            </p>
+            <strong style="color: var(--text-primary); display: block; font-size: 16px; margin-bottom: 6px;">1. How to navigate to the analyzer:</strong>
+            <p style="color: var(--text-muted); font-size: 15px; line-height: 1.75; margin-bottom: 0;">Click the "Analyzer" tab in the top navigation bar at any time.</p>
           </div>
           <div>
-            <strong style="color: var(--text-primary); display: block;">4. How to interpret the scores and recommendation:</strong>
-            <p style="color: var(--text-muted); margin-bottom: 0;">
+            <strong style="color: var(--text-primary); display: block; font-size: 16px; margin-bottom: 6px;">2. How to fill each input field:</strong>
+            <div style="color: var(--text-muted); font-size: 15px; line-height: 1.8; display: grid; gap: 6px;">
+              <div>• <strong style="color: var(--text-primary);">Row count:</strong> Enter row count with optional shorthand (e.g., 50K, 2M, 50M) or click a preset chip.</div>
+              <div>• <strong style="color: var(--text-primary);">Read / Write ratio:</strong> Drag the slider or enter percentages; values always sum to 100%.</div>
+              <div>• <strong style="color: var(--text-primary);">Query complexity:</strong> Select Simple (1-2 joins), Medium (3-4 joins), or Complex (5+ joins).</div>
+              <div>• <strong style="color: var(--text-primary);">Storage sensitivity:</strong> Select Low, Medium, or High depending on disk/RAM cost constraints.</div>
+              <div>• <strong style="color: var(--text-primary);">Consistency criticality:</strong> Select Low (eventual consistency), Medium, or High (strict ACID).</div>
+            </div>
+          </div>
+          <div>
+            <strong style="color: var(--text-primary); display: block; font-size: 16px; margin-bottom: 6px;">3. What each button does:</strong>
+            <div style="color: var(--text-muted); font-size: 15px; line-height: 1.8; display: grid; gap: 6px;">
+              <div>• <strong style="color: var(--text-primary);">Calculate:</strong> Recomputes scores and renders recommendation banner and radar chart.</div>
+              <div>• <strong style="color: var(--text-primary);">Reset:</strong> Restores baseline default parameters.</div>
+              <div>• <strong style="color: var(--text-primary);">Load Scenario:</strong> Auto-fills the form with preset workload profiles (Small OLTP, Analytics Dashboard, Mixed).</div>
+            </div>
+          </div>
+          <div>
+            <strong style="color: var(--text-primary); display: block; font-size: 16px; margin-bottom: 6px;">4. How to interpret the scores and recommendation:</strong>
+            <p style="color: var(--text-muted); font-size: 15px; line-height: 1.75; margin-bottom: 0;">
               Scores range from 0 to 10 (higher is better). If the denormalization score substantially exceeds normalization on read-dominant workloads, the tool recommends "Prefer Denormalization". When write frequency or consistency requirements are high, it recommends "Prefer Normalization". Balanced workloads result in "Hybrid".
             </p>
           </div>
           <div>
-            <strong style="color: var(--text-primary); display: block;">5. How to download a report:</strong>
-            <p style="color: var(--text-muted); margin-bottom: 0;">Click the "Download Report" button in the header or next to the results to export an executive PDF report, Word document, or plain text audit.</p>
+            <strong style="color: var(--text-primary); display: block; font-size: 16px; margin-bottom: 6px;">5. How to download a report:</strong>
+            <p style="color: var(--text-muted); font-size: 15px; line-height: 1.75; margin-bottom: 0;">Click the "Download Report" button in the Analyzer next to the recommendation results to export an executive PDF report, Word document, or plain text audit.</p>
           </div>
           <div>
-            <strong style="color: var(--text-primary); display: block;">6. How to toggle Day/Night mode:</strong>
-            <p style="color: var(--text-muted); margin-bottom: 0;">Click the sun/moon icon in the header. The setting is saved in your browser's local storage.</p>
+            <strong style="color: var(--text-primary); display: block; font-size: 16px; margin-bottom: 6px;">6. How to toggle Day/Night mode:</strong>
+            <p style="color: var(--text-muted); font-size: 15px; line-height: 1.75; margin-bottom: 0;">Click the sun/moon icon in the header. The setting is saved in your browser's local storage.</p>
           </div>
         </div>
       </div>
 
       <!-- FAQ -->
-      <div class="card">
-        <h2 style="font-size: 1.2rem; margin-bottom: var(--space-4);">Frequently Asked Questions (FAQ)</h2>
-        <div style="display: flex; flex-direction: column; gap: var(--space-3); font-size: 13px;">
+      <div class="card" style="padding: var(--space-6) var(--space-7);">
+        <h2 style="font-size: 1.35rem; margin-bottom: var(--space-5);">Frequently Asked Questions (FAQ)</h2>
+        <div style="display: flex; flex-direction: column; gap: var(--space-5);">
           <div>
-            <strong style="color: var(--text-primary);">Q: What if my read/write ratio changes over time?</strong>
-            <p style="color: var(--text-muted); margin-bottom: 0;">You can use the live "What-If" slider to drag the ratio and immediately observe the tipping point where denormalization becomes beneficial.</p>
+            <strong style="color: var(--text-primary); font-size: 16px; display: block; margin-bottom: 6px;">Q: What if my read/write ratio changes over time?</strong>
+            <p style="color: var(--text-muted); font-size: 15px; line-height: 1.75; margin-bottom: 0;">You can use the live "What-If" slider to drag the ratio and immediately observe the tipping point where denormalization becomes beneficial.</p>
           </div>
           <div>
-            <strong style="color: var(--text-primary);">Q: Does denormalization always mean faster queries?</strong>
-            <p style="color: var(--text-muted); margin-bottom: 0;">Not always. If the table size exceeds available RAM, denormalized wide rows cause frequent database buffer cache evictions, causing random disk seek bottlenecks.</p>
+            <strong style="color: var(--text-primary); font-size: 16px; display: block; margin-bottom: 6px;">Q: Does denormalization always mean faster queries?</strong>
+            <p style="color: var(--text-muted); font-size: 15px; line-height: 1.75; margin-bottom: 0;">Not always. If the table size exceeds available RAM, denormalized wide rows cause frequent database buffer cache evictions, causing random disk seek bottlenecks.</p>
           </div>
         </div>
       </div>
@@ -1210,9 +1258,67 @@
               <li>Upload a schema to discover pre-join candidate attributes.</li>
             </ul>
 
-            <div style="display: flex; justify-content: flex-end;">
+            <!-- ========================================================= -->
+            <!-- TRADE-OFF VISUALIZATION SCALE (BAR GRAPH ONLY)            -->
+            <!-- ========================================================= -->
+            <div id="tab-tradeoff-scale-section" class="tab-tradeoff-scale-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3); flex-wrap: wrap; gap: 8px;">
+                <div>
+                  <h3 style="font-size: 0.95rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; margin: 0; color: var(--text-primary);">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    Trade-off Visualization Scale (Bar Graph)
+                  </h3>
+                  <p style="font-size: 11px; color: var(--text-muted); margin: 2px 0 0 0;">
+                    5-dimension comparative bar graph comparing 3NF Normalization vs. Denormalization (0–10)
+                  </p>
+                </div>
+
+                <span class="verdict-tag" style="background: rgba(16, 185, 129, 0.1); color: var(--accent); border: 1px solid var(--accent); font-size: 11px; padding: 2px 8px;">
+                  Bar Graph
+                </span>
+              </div>
+
+              <!-- 1. Architectural Equilibrium Spectrum Bar -->
+              <div class="spectrum-scale-container">
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-bottom: 4px;">
+                  <span style="color: var(--indicator-norm); font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--indicator-norm);"></span>
+                    3NF: <span id="scale-norm-score">--</span>
+                  </span>
+                  <span id="scale-spectrum-status" style="color: var(--text-muted); font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em;">
+                    Awaiting Ingestion
+                  </span>
+                  <span style="color: var(--accent); font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent);"></span>
+                    Denorm: <span id="scale-denorm-score">--</span>
+                  </span>
+                </div>
+
+                <!-- Gradient Spectrum Track -->
+                <div class="spectrum-track-wrapper">
+                  <!-- Dynamic Sliding Pointer -->
+                  <div id="spectrum-pointer" class="spectrum-pointer" title="Architectural Equilibrium">
+                    <span class="spectrum-pointer-dot"></span>
+                  </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 4px;">
+                  <span>0.0 (Strict 3NF)</span>
+                  <span>5.0 (Balanced Hybrid)</span>
+                  <span>10.0 (Pure Denorm)</span>
+                </div>
+              </div>
+
+              <!-- 2. Grouped Bar Graph Canvas (Bar Graph Only) -->
+              <div style="position: relative; height: 230px; width: 100%; margin-top: var(--space-3); background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 10px;">
+                <canvas id="tab-diag-bar-chart"></canvas>
+              </div>
+
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4);">
               <button type="button" id="btn-view-in-analyzer" class="btn-accent-pill" style="padding: 6px 14px; font-size: 12px; display: none;">
-                View in Full Analyzer Radar Chart &rarr;
+                View Full Architectural Simulator &rarr;
               </button>
             </div>
           </div>

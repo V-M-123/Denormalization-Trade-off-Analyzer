@@ -7,13 +7,13 @@
 import { validateInputs } from './validation.js';
 import { calculateTradeoffScores } from './scoring.js';
 import { PRESET_SCENARIOS } from './scenarios.js';
-import { renderTradeoffChart, toggleChartType } from './chart.js';
+import { renderTradeoffChart, toggleChartType, resizeChart } from './chart.js';
 import { downloadPdfReport, downloadDocReport, downloadTextReport } from './pdfExport.js';
 import { getInitialTheme, applyTheme, toggleTheme } from './theme.js';
 import { initCursor } from './cursor.js';
-import { setupSchemaUploader } from './schemaUploader.js';
+import { setupSchemaUploader, resizeBarChart } from './schemaUploader.js';
 import { setupAuthUI } from './auth.js';
-import { setupSavedSchemasManager } from './savedSchemasManager.js';
+import { setupSavedSchemasManager, loadSavedSchemas } from './savedSchemasManager.js';
 import { animate, stagger } from 'motion';
 
 // Application State
@@ -22,109 +22,160 @@ let currentChartType = 'radar';
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Initialize Theme (Night by default per Modal reference)
-  const initialTheme = getInitialTheme();
-  applyTheme(initialTheme, handleThemeChange);
+  try {
+    const initialTheme = getInitialTheme();
+    applyTheme(initialTheme, handleThemeChange);
 
-  // Setup Theme Toggle Button
-  const themeToggle = document.getElementById('theme-toggle');
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-      toggleTheme(handleThemeChange);
-    });
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        toggleTheme(handleThemeChange);
+      });
+    }
+  } catch (err) {
+    console.error('Theme init error:', err);
   }
 
   // Setup Custom Cursor Switcher (Standard -> Magnetic Dual-Ring -> Aurora Pixel Trail)
-  initCursor();
+  try {
+    initCursor();
+  } catch (err) {
+    console.error('Cursor init error:', err);
+  }
 
   // 2. Setup Tab Navigation
-  setupNavigation();
+  try {
+    setupNavigation();
+  } catch (err) {
+    console.error('Navigation setup error:', err);
+  }
 
   // 3. Setup User Authentication & Session UI
-  setupAuthUI();
+  try {
+    setupAuthUI();
+  } catch (err) {
+    console.error('Auth UI setup error:', err);
+  }
 
   // 4. Setup Saved Databases & Drift Change Tracking
-  setupSavedSchemasManager((schemaDetails) => {
-    // Populate DDL preview
-    const ddlTextarea = document.getElementById('tab-input-schema-sql');
-    if (ddlTextarea && schemaDetails.schema.ddl_content) {
-      ddlTextarea.value = schemaDetails.schema.ddl_content;
-    }
+  try {
+    setupSavedSchemasManager((schemaDetails) => {
+      // Populate DDL preview
+      const ddlTextarea = document.getElementById('tab-input-schema-sql');
+      if (ddlTextarea && schemaDetails.schema.ddl_content) {
+        ddlTextarea.value = schemaDetails.schema.ddl_content;
+      }
 
-    // If an analysis run exists, load its evaluation
-    if (schemaDetails.runs && schemaDetails.runs.length > 0) {
-      const run = schemaDetails.runs[0];
-      const verdict = run.verdict || 'Hybrid';
-      const badgeClass = verdict.toLowerCase().includes('denorm') ? 'denorm' : verdict.toLowerCase().includes('norm') ? 'norm' : 'hybrid';
-      const explanation = run.recommendation_details || '';
-      const keyTakeaways = {
-        why: `Benchmark run loaded for ${schemaDetails.title || 'saved schema'}.`,
-        whatCouldChange: 'Modify workload parameters to recalculate trade-offs.'
-      };
-      const customEval = {
-        isCustomSchema: true,
-        datasetName: schemaDetails.title || 'Saved Database',
-        schemaSummary: {
-          tableCount: schemaDetails.schema.table_count || 1,
-          foreignKeysCount: schemaDetails.schema.foreign_keys_count || 0,
-          maxJoinDepth: schemaDetails.schema.max_join_depth || 1,
-          estimatedNormalForm: schemaDetails.schema.estimated_normal_form || '3NF'
-        },
-        verdict,
-        badgeClass,
-        scores: {
-          normalizedAverage: run.normalized_average,
-          denormalizedAverage: run.denormalized_average,
-          margin: run.confidence_margin
-        },
-        breakdown: run.scores_breakdown || {},
-        explanation,
-        keyTakeaways,
-        recommendation: {
+      // If an analysis run exists, load its evaluation
+      if (schemaDetails.runs && schemaDetails.runs.length > 0) {
+        const run = schemaDetails.runs[0];
+        const verdict = run.verdict || 'Hybrid';
+        const badgeClass = verdict.toLowerCase().includes('denorm') ? 'denorm' : verdict.toLowerCase().includes('norm') ? 'norm' : 'hybrid';
+        const explanation = run.recommendation_details || '';
+        const keyTakeaways = {
+          why: `Benchmark run loaded for ${schemaDetails.title || 'saved schema'}.`,
+          whatCouldChange: 'Modify workload parameters to recalculate trade-offs.'
+        };
+        const customEval = {
+          isCustomSchema: true,
+          datasetName: schemaDetails.title || 'Saved Database',
+          schemaSummary: {
+            tableCount: schemaDetails.schema.table_count || 1,
+            foreignKeysCount: schemaDetails.schema.foreign_keys_count || 0,
+            maxJoinDepth: schemaDetails.schema.max_join_depth || 1,
+            estimatedNormalForm: schemaDetails.schema.estimated_normal_form || '3NF'
+          },
           verdict,
           badgeClass,
+          scores: {
+            normalizedAverage: run.normalized_average,
+            denormalizedAverage: run.denormalized_average,
+            margin: run.confidence_margin
+          },
+          breakdown: run.scores_breakdown || {},
           explanation,
-          keyTakeaways
-        },
-        inputs: {
-          rowCount: run.workload_params?.rowCount || 1000000,
-          readPercent: run.workload_params?.readPercent || 80,
-          writePercent: run.workload_params?.writePercent || 20,
-          queryComplexity: 'medium',
-          storageCostSensitivity: 'medium',
-          dataConsistencyCriticality: 'high'
-        }
-      };
-      activateCustomDataset(customEval);
-      const analyzerNavBtn = document.querySelector('[data-nav-target="tab-analyzer"]');
-      if (analyzerNavBtn) analyzerNavBtn.click();
-    }
-  });
+          keyTakeaways,
+          recommendation: {
+            verdict,
+            badgeClass,
+            explanation,
+            keyTakeaways
+          },
+          inputs: {
+            rowCount: run.workload_params?.rowCount || 1000000,
+            readPercent: run.workload_params?.readPercent || 80,
+            writePercent: run.workload_params?.writePercent || 20,
+            queryComplexity: 'medium',
+            storageCostSensitivity: 'medium',
+            dataConsistencyCriticality: 'high'
+          }
+        };
+        activateCustomDataset(customEval);
+        const analyzerNavBtn = document.querySelector('[data-nav-target="tab-analyzer"]');
+        if (analyzerNavBtn) analyzerNavBtn.click();
+      }
+    });
+  } catch (err) {
+    console.error('Saved schemas setup error:', err);
+  }
 
   // 5. Setup Workload Presets
-  setupPresets();
+  try {
+    setupPresets();
+  } catch (err) {
+    console.error('Presets setup error:', err);
+  }
 
   // 6. Setup Form Event Listeners & Live What-If Slider
-  setupForm();
+  try {
+    setupForm();
+  } catch (err) {
+    console.error('Form setup error:', err);
+  }
 
   // 7. Setup Custom Schema Uploader & Diagnostics
-  setupSchemaUploader((customEval) => {
-    activateCustomDataset(customEval);
-  });
+  try {
+    setupSchemaUploader((customEval) => {
+      activateCustomDataset(customEval);
+    });
+  } catch (err) {
+    console.error('Schema uploader setup error:', err);
+  }
 
   // 8. Setup Chart Toggle Button
-  setupChartControls();
+  try {
+    setupChartControls();
+  } catch (err) {
+    console.error('Chart controls setup error:', err);
+  }
 
   // 9. Setup Download Report Modal
-  setupDownloadModal();
+  try {
+    setupDownloadModal();
+  } catch (err) {
+    console.error('Download modal setup error:', err);
+  }
 
   // 10. Setup Dev/Test Runner Panel
-  setupTestPanel();
+  try {
+    setupTestPanel();
+  } catch (err) {
+    console.error('Test panel setup error:', err);
+  }
 
   // 11. Initial calculation with default Analytics Dashboard preset
-  loadScenario(PRESET_SCENARIOS[1]);
+  try {
+    loadScenario(PRESET_SCENARIOS[1]);
+  } catch (err) {
+    console.error('Scenario load error:', err);
+  }
 
   // 12. ReactBits Spotlight Card Effect Initializer
-  initSpotlightCards();
+  try {
+    initSpotlightCards();
+  } catch (err) {
+    console.error('Spotlight cards error:', err);
+  }
 });
 
 function handleThemeChange(newTheme) {
@@ -194,7 +245,8 @@ function setupNavigation() {
   }
 
   function switchTab(targetId, withSweep = false) {
-    if (!targetId || targetId === activeTabId) return;
+    if (!targetId) return;
+    if (targetId === activeTabId) return;
 
     // Trigger the Cinematic Aurora Sweep when entering the Analyzer from Home
     if (withSweep || (activeTabId === 'tab-home' && targetId === 'tab-analyzer')) {
@@ -226,61 +278,86 @@ function setupNavigation() {
       }
     }
 
-    const currentSection = document.getElementById(activeTabId);
+    const prevTabId = activeTabId;
     activeTabId = targetId;
 
     if (tabSwitchTimeout) {
       clearTimeout(tabSwitchTimeout);
+      tabSwitchTimeout = null;
     }
 
-    // 1. Dissolve out current active section over 0.75s
-    if (currentSection && currentSection.style.display !== 'none') {
-      currentSection.classList.remove('tab-fade-in');
+    const currentSection = document.getElementById(prevTabId);
+    const targetSection = document.getElementById(targetId);
+
+    // Hide any other sections that are neither current nor target
+    tabSections.forEach(section => {
+      if (section !== currentSection && section !== targetSection) {
+        section.classList.add('sr-only');
+        section.classList.remove('tab-fade-in', 'tab-fade-out');
+        section.style.display = 'none';
+      }
+    });
+
+    // Simultaneous 1.5s crossfade: current fades out while target fades in
+    if (currentSection && currentSection !== targetSection) {
+      currentSection.classList.remove('tab-fade-in', 'sr-only');
+      currentSection.style.display = 'block';
       void currentSection.offsetWidth;
       currentSection.classList.add('tab-fade-out');
     }
 
-    // 2. Open and dissolve in target section after 0.75s (750ms) delay
-    tabSwitchTimeout = setTimeout(() => {
-      tabSections.forEach(section => {
-        if (section.id === targetId) {
-          section.classList.remove('sr-only', 'tab-fade-out');
-          section.style.display = 'block';
-          // Force layout reflow so the CSS animation always replays
-          void section.offsetWidth;
-          section.classList.add('tab-fade-in');
-        } else {
-          section.classList.add('sr-only');
-          section.classList.remove('tab-fade-in', 'tab-fade-out');
-          section.style.display = 'none';
-        }
-      });
+    if (targetSection) {
+      targetSection.classList.remove('sr-only', 'tab-fade-out');
+      targetSection.style.display = 'block';
+      void targetSection.offsetWidth;
+      targetSection.classList.add('tab-fade-in');
+    }
 
-      // If user was scrolled down, reset scroll to top for fresh tab
-      if (window.scrollY > 120) {
-        window.scrollTo({ top: 0, behavior: 'instant' });
-      }
+    // Reset scroll to top if user was scrolled down
+    if (window.scrollY > 40) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
 
-      // If switching to analyzer, ensure full analysis results and chart render cleanly
-      if (targetId === 'tab-analyzer' && currentEvaluation) {
+    // Tab-specific activations and canvas resizers
+    if (targetId === 'tab-analyzer') {
+      if (currentEvaluation) {
         renderResults(currentEvaluation);
-        setTimeout(() => {
-          const isDay = document.documentElement.getAttribute('data-theme') === 'day';
-          const canvas = document.getElementById('tradeoff-chart');
-          if (canvas && currentEvaluation.breakdown) {
-            renderTradeoffChart(canvas, currentEvaluation.breakdown, isDay, currentChartType);
-          }
-        }, 50);
+      } else {
+        evaluateForm();
       }
-
-      // Clean up fade-in animation state so text returns to 100% native vector rendering
-      setTimeout(() => {
-        const targetEl = document.getElementById(targetId);
-        if (targetEl && targetEl.id === activeTabId) {
-          targetEl.classList.remove('tab-fade-in');
+      requestAnimationFrame(() => {
+        const isDay = document.documentElement.getAttribute('data-theme') === 'day';
+        const canvas = document.getElementById('tradeoff-chart');
+        if (canvas && currentEvaluation && currentEvaluation.breakdown) {
+          renderTradeoffChart(canvas, currentEvaluation.breakdown, isDay, currentChartType);
         }
-      }, 760);
-    }, 750);
+        resizeChart();
+      });
+    } else if (targetId === 'tab-submit-schema') {
+      requestAnimationFrame(() => {
+        resizeBarChart();
+      });
+    } else if (targetId === 'tab-my-schemas') {
+      loadSavedSchemas();
+    } else if (targetId === 'tab-tests') {
+      runAutomatedTests();
+    }
+
+    const outgoing = currentSection;
+    const incoming = targetSection;
+
+    // After 1.5 seconds (1500ms), cleanup outgoing and incoming state
+    tabSwitchTimeout = setTimeout(() => {
+      if (outgoing && outgoing !== document.getElementById(activeTabId)) {
+        outgoing.style.display = 'none';
+        outgoing.classList.add('sr-only');
+        outgoing.classList.remove('tab-fade-out');
+      }
+      if (incoming) {
+        incoming.classList.remove('tab-fade-in');
+      }
+      tabSwitchTimeout = null;
+    }, 1500);
   }
 
   navButtons.forEach(btn => {
@@ -416,7 +493,7 @@ function activateCustomDataset(customEval) {
     chipsContainer.prepend(customChip);
   }
   if (customChip) {
-    customChip.textContent = `★ ${customEval.datasetName || 'Custom Schema'}`;
+    customChip.textContent = `${customEval.datasetName || 'Custom Schema'}`;
     customChip.classList.add('active');
     customChip.style.display = 'inline-block';
     customChip.onclick = () => {
@@ -571,17 +648,22 @@ function setupForm() {
     triggerLiveEvaluation();
   });
 
-  // Segmented button groups
-  document.querySelectorAll('.segmented-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const group = btn.getAttribute('data-segmented-group');
-      const val = btn.getAttribute('data-value');
-      setSegmentedValue(group, val);
-      if (liveToggle && liveToggle.checked) {
-        evaluateForm();
-      }
+  // Segmented button groups (scoped strictly to analyzer-form)
+  const analyzerForm = document.getElementById('analyzer-form');
+  if (analyzerForm) {
+    analyzerForm.querySelectorAll('.segmented-btn[data-segmented-group]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const group = btn.getAttribute('data-segmented-group');
+        const val = btn.getAttribute('data-value');
+        if (group && val) {
+          setSegmentedValue(group, val);
+          if (liveToggle && liveToggle.checked) {
+            evaluateForm();
+          }
+        }
+      });
     });
-  });
+  }
 
   // Quick Row Presets (10K, 500K, 2M, 10M, 50M)
   document.querySelectorAll('[data-row-preset]').forEach(btn => {
@@ -985,20 +1067,30 @@ function setupChartControls() {
  * Setup Download Modal with 21st.dev Spring Motion Animation
  */
 function setupDownloadModal() {
-  const openButtons = document.querySelectorAll('[data-action="open-download"]');
   const modal = document.getElementById('download-modal');
   const closeBtn = document.getElementById('close-download-modal');
 
   function openModal() {
-    if (!currentEvaluation) evaluateForm();
+    try {
+      if (!currentEvaluation) evaluateForm();
+    } catch (err) {
+      console.warn('Form evaluation warning in openModal:', err);
+    }
+
     if (modal) {
       modal.style.display = 'flex';
+      modal.style.opacity = '1';
       modal.setAttribute('aria-hidden', 'false');
       const content = modal.querySelector('.modal-content');
       if (content) {
-        animate(content, { opacity: [0, 1], scale: [0.93, 1], y: [12, 0] }, { duration: 0.24, ease: [0.16, 1, 0.3, 1] });
+        content.style.opacity = '1';
+        content.style.transform = 'none';
+        try {
+          animate(content, { opacity: [0, 1], scale: [0.93, 1], y: [12, 0] }, { duration: 0.22, ease: [0.16, 1, 0.3, 1] });
+        } catch {
+          content.style.opacity = '1';
+        }
       }
-      animate(modal, { opacity: [0, 1] }, { duration: 0.2 });
     }
   }
 
@@ -1006,10 +1098,17 @@ function setupDownloadModal() {
     if (modal) {
       const content = modal.querySelector('.modal-content');
       if (content) {
-        animate(content, { opacity: [1, 0], scale: [1, 0.94] }, { duration: 0.15 }).then(() => {
+        try {
+          animate(content, { opacity: [1, 0], scale: [1, 0.94] }, { duration: 0.14 }).then(() => {
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+            content.style.opacity = '1';
+            content.style.transform = 'none';
+          });
+        } catch {
           modal.style.display = 'none';
           modal.setAttribute('aria-hidden', 'true');
-        });
+        }
       } else {
         modal.style.display = 'none';
         modal.setAttribute('aria-hidden', 'true');
@@ -1017,15 +1116,21 @@ function setupDownloadModal() {
     }
   }
 
-  openButtons.forEach(btn => {
-    btn.addEventListener('click', (e) => {
+  // Global delegated click handler for opening modal - 100% resilient
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action="open-download"], #btn-download-report');
+    if (btn) {
       e.preventDefault();
+      e.stopPropagation();
       openModal();
-    });
+    }
   });
 
   if (closeBtn) {
-    closeBtn.addEventListener('click', closeModal);
+    closeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeModal();
+    });
   }
 
   if (modal) {
@@ -1033,6 +1138,12 @@ function setupDownloadModal() {
       if (e.target === modal) closeModal();
     });
   }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal && modal.style.display === 'flex') {
+      closeModal();
+    }
+  });
 
   // Download Action Buttons inside modal
   const btnPdf = document.getElementById('dl-pdf');
