@@ -1333,4 +1333,72 @@ body.cursor-mode-magnetic * {
   color: var(--text-muted);
 }
 
+/* ==============================================================================
+   AI QUIZ & COMPETITIVE EXAM STYLING
+   ============================================================================== */
+
+/* Exam Filter Pills */
+.exam-cat-pill,
+.exam-topic-pill {
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--surface-elevated);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.exam-cat-pill:hover,
+.exam-topic-pill:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+  background: var(--surface-muted);
+}
+
+.exam-cat-pill.active,
+.exam-topic-pill.active {
+  background: rgba(127, 238, 100, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Quiz Option Hover & Selection */
+.quiz-option-item:hover {
+  border-color: var(--border-hover) !important;
+  background: var(--surface-muted) !important;
+}
+
+.quiz-diff-card:hover {
+  border-color: var(--border-hover) !important;
+}
+
+.quiz-diff-card.active {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.quiz-count-chip {
+  padding: 6px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: var(--radius-pill);
+}
+
+.quiz-count-chip.active {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  background: rgba(127, 238, 100, 0.1) !important;
+}
+
+/* Exam Card Hover */
+.exam-question-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+}
+
+
 

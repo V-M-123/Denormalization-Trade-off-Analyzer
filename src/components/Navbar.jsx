@@ -11,7 +11,8 @@ import {
   ShieldCheck,
   MousePointer,
   Sparkles,
-  CircleDot
+  CircleDot,
+  Award
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useCursor } from '../context/CursorContext';
@@ -27,6 +28,8 @@ export default function Navbar({
   const navTabs = [
     { id: 'analyzer', label: 'Analyzer', icon: Sliders },
     { id: 'learn', label: 'Learn', icon: BookOpen },
+    { id: 'quiz', label: 'QUIZ', icon: CircleDot },
+    { id: 'competitiveExam', label: 'COMPETITIVE EXAM', icon: Award },
     { id: 'developedBy', label: 'Developed By', icon: UserCheck },
     { id: 'help', label: 'Help', icon: HelpCircle },
     { id: 'tests', label: 'Test Suite', icon: ShieldCheck },

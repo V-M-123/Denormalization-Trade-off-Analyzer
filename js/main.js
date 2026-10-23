@@ -14,6 +14,8 @@ import { initCursor } from './cursor.js';
 import { setupSchemaUploader, resizeBarChart } from './schemaUploader.js';
 import { setupAuthUI } from './auth.js';
 import { setupSavedSchemasManager, loadSavedSchemas } from './savedSchemasManager.js';
+import { initQuiz } from './quiz.js';
+import { initCompetitiveExams } from './competitiveExam.js';
 import { animate, stagger } from 'motion';
 
 // Application State
@@ -175,6 +177,14 @@ document.addEventListener('DOMContentLoaded', () => {
     initSpotlightCards();
   } catch (err) {
     console.error('Spotlight cards error:', err);
+  }
+
+  // 13. Interactive AI Quiz & Competitive Examination Question Bank
+  try {
+    initQuiz();
+    initCompetitiveExams();
+  } catch (err) {
+    console.error('Quiz / Competitive Exams init error:', err);
   }
 });
 
@@ -339,6 +349,10 @@ function setupNavigation() {
       });
     } else if (targetId === 'tab-my-schemas') {
       loadSavedSchemas();
+    } else if (targetId === 'tab-quiz') {
+      initQuiz();
+    } else if (targetId === 'tab-competitive-exam') {
+      initCompetitiveExams();
     } else if (targetId === 'tab-tests') {
       runAutomatedTests();
     }
@@ -372,6 +386,20 @@ function setupNavigation() {
   if (heroLaunchBtn) {
     heroLaunchBtn.addEventListener('click', () => {
       switchTab('tab-analyzer', true);
+    });
+  }
+
+  const heroQuizBtn = document.getElementById('hero-quiz-btn');
+  if (heroQuizBtn) {
+    heroQuizBtn.addEventListener('click', () => {
+      switchTab('tab-quiz');
+    });
+  }
+
+  const heroExamBtn = document.getElementById('hero-exam-btn');
+  if (heroExamBtn) {
+    heroExamBtn.addEventListener('click', () => {
+      switchTab('tab-competitive-exam');
     });
   }
 

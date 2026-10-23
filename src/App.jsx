@@ -6,6 +6,8 @@ import { MagneticCursor } from './components/ui/magnetic-cursor';
 import Navbar from './components/Navbar';
 import Workbench from './components/Workbench';
 import LearnSection from './components/LearnSection';
+import QuizSection from './components/QuizSection';
+import CompetitiveExamSection from './components/CompetitiveExamSection';
 import DevelopedBy from './components/DevelopedBy';
 import HelpSection from './components/HelpSection';
 import TestSuite from './components/TestSuite';
@@ -81,6 +83,14 @@ function AppContent() {
 
         {activeTab === 'learn' && (
           <LearnSection />
+        )}
+
+        {activeTab === 'quiz' && (
+          <QuizSection />
+        )}
+
+        {activeTab === 'competitiveExam' && (
+          <CompetitiveExamSection />
         )}
 
         {activeTab === 'developedBy' && (
